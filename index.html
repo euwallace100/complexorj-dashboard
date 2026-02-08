@@ -830,209 +830,15 @@
         };
 
         // ══════════════════════════════════════════════════════════════
-        // DADOS LOCAIS (fallback e cache)
+        // DADOS (carregados do servidor)
         // ══════════════════════════════════════════════════════════════
-        let cadastros = [
-            {id:"474960019352190977",nome:"Cleytin",cidade:7,cargo:"COO"},
-            {id:"564202515277545474",nome:"Magic",cidade:5,cargo:"COO"},
-            {id:"946946868062064640",nome:"Draco",cidade:22,cargo:"COO"},
-            {id:"895440895573377024",nome:"Renan",cidade:8,cargo:"CM"},
-            {id:"1174604150441508951",nome:"Neguin",cidade:6,cargo:"CM"},
-            {id:"332642075046707200",nome:"Sabrina",cidade:9,cargo:"CM"},
-            {id:"313413900655919119",nome:"Vitor",cidade:10,cargo:"CTO"},
-            {id:"1227793981761392661",nome:"Stella",cidade:77,cargo:"CTO"},
-            {id:"584401973441200165",nome:"Lukinhas",cidade:777,cargo:"CTO"},
-            {id:"1113100617557233674",nome:"Theus",cidade:108,cargo:"SPV"},
-            {id:"1199328901973934200",nome:"Theo",cidade:177,cargo:"SPV"},
-            {id:"931238917066338305",nome:"Biel",cidade:21,cargo:"SPV"},
-            {id:"891240468900368386",nome:"Wolfy",cidade:61,cargo:"ADM"},
-            {id:"1101636450904178770",nome:"Bryan TL",cidade:1379,cargo:"ADM"},
-            {id:"1065700375002357761",nome:"Myra",cidade:1027,cargo:"ADM"},
-            {id:"1031310501503840276",nome:"Forever",cidade:1176,cargo:"ADM"},
-            {id:"521404156628434955",nome:"Caca",cidade:2121,cargo:"ADM"},
-            {id:"220031413439823874",nome:"Tanaka",cidade:50,cargo:"ADM.T"},
-            {id:"349561033976709131",nome:"Ninja",cidade:2532,cargo:"ADM.T"},
-            {id:"1053718188594053190",nome:"Guzzman",cidade:1277,cargo:"ADM.T"},
-            {id:"646770495739658240",nome:"Deyvid",cidade:1142,cargo:"ADM.T"},
-            {id:"389554143548669954",nome:"Marcola",cidade:2697,cargo:"MOD"},
-            {id:"1228586456356753418",nome:"Marco",cidade:103,cargo:"MOD"},
-            {id:"1173838707531448340",nome:"Eve",cidade:17,cargo:"MOD"},
-            {id:"908926169573912586",nome:"Richard",cidade:1192,cargo:"MOD.T"},
-            {id:"343567117842513921",nome:"Tsujiro",cidade:1341,cargo:"MOD.T"},
-            {id:"662447781146787865",nome:"Lord",cidade:111,cargo:"MOD.T"},
-            {id:"328272322043576331",nome:"Duda",cidade:1432,cargo:"MOD.T"},
-            {id:"725848962661089360",nome:"Felicia",cidade:1370,cargo:"SUP"},
-            {id:"382577148612968448",nome:"Floripa",cidade:112,cargo:"SUP"},
-            {id:"1268060799696502898",nome:"Grego",cidade:55,cargo:"SUP"},
-            {id:"651764927434063922",nome:"Pitoco",cidade:1312,cargo:"SUP"},
-            {id:"932505145814691850",nome:"Malaka",cidade:19,cargo:"SUP"},
-            {id:"288817972020117505",nome:"Ayla",cidade:16,cargo:"SUP.T"},
-            {id:"1256826056338313217",nome:"Henrique",cidade:244,cargo:"SUP.T"},
-            {id:"796084347102298143",nome:"Maycon",cidade:1883,cargo:"SUP.T"},
-            {id:"1252601661520871424",nome:"Roox",cidade:110,cargo:"SUP.T"},
-            {id:"956257474082644028",nome:"Cruz",cidade:2181,cargo:"SUP.T"},
-            {id:"1270591055112437802",nome:"Yan",cidade:3466,cargo:"SUP.T"},
-            {id:"715060442443284570",nome:"Rafaela",cidade:1153,cargo:"SUP.T"},
-            {id:"241663532872105987",nome:"Lorran",cidade:1066,cargo:"SUP.T"},
-            {id:"761759174530170890",nome:"Safira",cidade:1464,cargo:"SUP.T"},
-            {id:"1161310361769742479",nome:"Coutinho",cidade:1642,cargo:"SUP.T"},
-            {id:"522087737566691328",nome:"Carpones",cidade:137,cargo:"SUP.T"},
-            {id:"541626886158024735",nome:"GB",cidade:1451,cargo:"SUP.T"},
-            {id:"852710786782593024",nome:"Gomes",cidade:34281,cargo:"SUP.T"},
-            {id:"662825251444490251",nome:"Harry",cidade:8119,cargo:"SUP.T"},
-            {id:"1273286833094004915",nome:"Joaquimxz",cidade:222,cargo:"SUP.T"},
-            {id:"480778809491062794",nome:"Kyara",cidade:2134,cargo:"SUP.T"},
-            {id:"1135974604620431451",nome:"Mylla",cidade:5708,cargo:"SUP.T"},
-            {id:"567065849245073419",nome:"Nati",cidade:34279,cargo:"SUP.T"},
-            {id:"1261073720135651350",nome:"Paiva",cidade:40556,cargo:"SUP.T"},
-            {id:"795841410762670210",nome:"Pelet",cidade:1095,cargo:"SUP.T"},
-            {id:"1144583288833454131",nome:"Raro",cidade:555,cargo:"SUP.T"},
-            {id:"1272664554807103549",nome:"Ximene",cidade:3434,cargo:"SUP.T"},
-            {id:"432427208363999232",nome:"Zeca",cidade:7562,cargo:"EST"},
-            {id:"644244264666267680",nome:"West",cidade:1158,cargo:"EST"},
-            {id:"838129474221637682",nome:"Vegas",cidade:2154,cargo:"EST"},
-            {id:"883211948357984286",nome:"TwoSix",cidade:2602,cargo:"EST"},
-            {id:"1181413085408399390",nome:"Trevor",cidade:9413,cargo:"EST"},
-            {id:"1247208438883418122",nome:"THZ",cidade:1625,cargo:"EST"},
-            {id:"481904492611108864",nome:"Tche",cidade:12856,cargo:"EST"},
-            {id:"1110808777147547699",nome:"Scott",cidade:7837,cargo:"EST"},
-            {id:"436674059795824651",nome:"Risoka",cidade:2023,cargo:"EST"},
-            {id:"290652776135000065",nome:"RiCo",cidade:1886,cargo:"EST"},
-            {id:"591325399544496139",nome:"Ramires",cidade:1735,cargo:"EST"},
-            {id:"519246718785552405",nome:"Nunc",cidade:1615,cargo:"EST"},
-            {id:"966790397563121676",nome:"Nox",cidade:2279,cargo:"EST"},
-            {id:"1039683340850167871",nome:"Milena",cidade:25111,cargo:"EST"},
-            {id:"1134227055173697687",nome:"Matheus",cidade:23340,cargo:"EST"},
-            {id:"878535104119582791",nome:"Marys",cidade:1599,cargo:"EST"},
-            {id:"545933593378160652",nome:"Limao",cidade:3479,cargo:"EST"},
-            {id:"268128988176711680",nome:"Leo",cidade:42577,cargo:"EST"},
-            {id:"1233868848277753940",nome:"Lekis",cidade:2778,cargo:"EST"},
-            {id:"631661228975980545",nome:"Jason",cidade:2126,cargo:"EST"},
-            {id:"246336401916952576",nome:"Japa",cidade:1854,cargo:"EST"},
-            {id:"274968502509502464",nome:"James",cidade:1160,cargo:"EST"},
-            {id:"684192249651003402",nome:"Holanda",cidade:4334,cargo:"EST"},
-            {id:"941711154437312533",nome:"Guerra",cidade:9058,cargo:"EST"},
-            {id:"1140370926458908835",nome:"Gbzin",cidade:101,cargo:"EST"},
-            {id:"1213679491625521184",nome:"Gabriel",cidade:1841,cargo:"EST"},
-            {id:"1233431126778052760",nome:"FK Kamal",cidade:1738,cargo:"EST"},
-            {id:"717204428339544104",nome:"Ester",cidade:20497,cargo:"EST"},
-            {id:"801194038871064678",nome:"Dinmy",cidade:2233,cargo:"EST"},
-            {id:"700443993468698664",nome:"Dantas",cidade:25113,cargo:"EST"},
-            {id:"1205929162380935169",nome:"Connor S",cidade:1403,cargo:"EST"},
-            {id:"248570634056105986",nome:"Chaperoso",cidade:1718,cargo:"EST"},
-            {id:"679914264173215753",nome:"Carioca",cidade:2658,cargo:"EST"},
-            {id:"663440263401963546",nome:"Caio",cidade:41356,cargo:"EST"},
-            {id:"1286000579675558008",nome:"Bianca",cidade:5432,cargo:"EST"},
-            {id:"372200798421254155",nome:"Beatriz",cidade:39422,cargo:"EST"},
-            {id:"474963245288128536",nome:"Artemis",cidade:1177,cargo:"EST"}
-        ];
+        let cadastros = [];
 
-        let estagiarios = [
-            {nome:"Zeca",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:6,atSup:37,chat:0,atCid:24,aulas:1,ban:0},
-            {nome:"West",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:1,atSup:4,chat:0,atCid:9,aulas:1,ban:0},
-            {nome:"Vegas",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:8,atSup:32,chat:22,atCid:59,aulas:1,ban:0},
-            {nome:"TwoSix",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:37,atSup:189,chat:45,atCid:289,aulas:1,ban:0},
-            {nome:"Trevor",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:11,atSup:68,chat:4,atCid:135,aulas:1,ban:0},
-            {nome:"THZ",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
-            {nome:"Tche",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:10,atSup:14,chat:0,atCid:12,aulas:1,ban:0},
-            {nome:"Scott",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:14,atSup:31,chat:2,atCid:107,aulas:1,ban:0},
-            {nome:"Risoka",cargo:"EST",situacao:"✳️MANTÉM",aprov:33.3,horas:42,atSup:181,chat:69,atCid:185,aulas:1,ban:0},
-            {nome:"RiCo",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
-            {nome:"Ramires",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:23,atSup:76,chat:20,atCid:73,aulas:1,ban:0},
-            {nome:"Nunc",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:10,atSup:86,chat:28,atCid:208,aulas:1,ban:0},
-            {nome:"Nox",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
-            {nome:"Milena",cargo:"EST",situacao:"✳️MANTÉM",aprov:33.3,horas:17,atSup:38,chat:34,atCid:393,aulas:1,ban:0},
-            {nome:"Matheus",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:2,atSup:0,chat:2,atCid:31,aulas:1,ban:0},
-            {nome:"Marys",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:29,atSup:70,chat:15,atCid:266,aulas:1,ban:0},
-            {nome:"Limao",cargo:"EST",situacao:"❌EXONERADO",aprov:66.7,horas:29,atSup:183,chat:93,atCid:476,aulas:1,ban:0},
-            {nome:"Leo",cargo:"EST",situacao:"✳️MANTÉM",aprov:33.3,horas:37,atSup:198,chat:6,atCid:330,aulas:1,ban:0},
-            {nome:"Lekis",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:5,atSup:13,chat:10,atCid:28,aulas:1,ban:0},
-            {nome:"Jason",cargo:"EST",situacao:"✅PROMO",aprov:50,horas:19,atSup:16,chat:13,atCid:474,aulas:1,ban:0},
-            {nome:"Japa",cargo:"EST",situacao:"✅PROMO",aprov:50,horas:14,atSup:27,chat:48,atCid:428,aulas:1,ban:0},
-            {nome:"James",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:9,atSup:21,chat:1,atCid:72,aulas:1,ban:0},
-            {nome:"Holanda",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:0,atSup:0,chat:1,atCid:0,aulas:1,ban:0},
-            {nome:"Guerra",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:6,atSup:26,chat:7,atCid:111,aulas:1,ban:0},
-            {nome:"Gbzin",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
-            {nome:"Gabriel",cargo:"EST",situacao:"✅PROMO",aprov:50,horas:31,atSup:228,chat:95,atCid:389,aulas:1,ban:0},
-            {nome:"FK Kamal",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:40,atSup:174,chat:5,atCid:111,aulas:1,ban:0},
-            {nome:"Ester",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
-            {nome:"Dinmy",cargo:"EST",situacao:"✅PROMO",aprov:33.3,horas:36,atSup:280,chat:53,atCid:231,aulas:1,ban:0},
-            {nome:"Dantas",cargo:"EST",situacao:"✅PROMO",aprov:66.7,horas:135,atSup:93,chat:68,atCid:214,aulas:1,ban:0},
-            {nome:"Connor S",cargo:"EST",situacao:"✅PROMO",aprov:16.7,horas:26,atSup:175,chat:4,atCid:9,aulas:1,ban:0},
-            {nome:"Chaperoso",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:10,atSup:46,chat:16,atCid:101,aulas:1,ban:0},
-            {nome:"Carioca",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:7,atSup:5,chat:0,atCid:19,aulas:1,ban:0},
-            {nome:"Caio",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:9,atSup:74,chat:27,atCid:168,aulas:1,ban:0},
-            {nome:"Bianca",cargo:"EST",situacao:"✅PROMO",aprov:50,horas:33,atSup:128,chat:30,atCid:534,aulas:1,ban:0},
-            {nome:"Beatriz",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:1,atSup:0,chat:7,atCid:0,aulas:1,ban:0},
-            {nome:"Artemis",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:12,atSup:53,chat:2,atCid:213,aulas:1,ban:0}
-        ];
-
-        let suportes = [
-            {nome:"Felicia",cargo:"SUP",situacao:"✅PROMO",aprov:14.3,horas:79,atSup:80,auxSup:14,atCid:153,denuncia:69,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Floripa",cargo:"SUP",situacao:"✳️MANTÉM",aprov:14.3,horas:60,atSup:29,auxSup:36,atCid:59,denuncia:97,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Grego",cargo:"SUP",situacao:"✳️MANTÉM",aprov:14.3,horas:25,atSup:73,auxSup:34,atCid:158,denuncia:47,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Pitoco",cargo:"SUP",situacao:"✅PROMO",aprov:28.6,horas:100,atSup:154,auxSup:41,atCid:163,denuncia:104,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Malaka",cargo:"SUP",situacao:"✅PROMO",aprov:28.6,horas:83,atSup:286,auxSup:21,atCid:387,denuncia:119,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Ayla",cargo:"SUP.T",situacao:"✅PROMO",aprov:71.4,horas:108,atSup:296,auxSup:31,atCid:313,denuncia:127,aulas:1,ban:35,telagem:0,ticketSS:0},
-            {nome:"Henrique",cargo:"SUP.T",situacao:"❌EXONERADO",aprov:14.3,horas:1,atSup:1,auxSup:0,atCid:0,denuncia:0,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Maycon",cargo:"SUP.T",situacao:"✅PROMO",aprov:28.6,horas:87,atSup:149,auxSup:34,atCid:310,denuncia:75,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Roox",cargo:"SUP.T",situacao:"❌EXONERADO",aprov:14.3,horas:0,atSup:0,auxSup:0,atCid:0,denuncia:0,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Cruz",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:46,atSup:47,auxSup:35,atCid:81,denuncia:28,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Yan",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:64,atSup:76,auxSup:79,atCid:143,denuncia:30,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Rafaela",cargo:"SUP.T",situacao:"✅PROMO",aprov:14.3,horas:58,atSup:129,auxSup:14,atCid:72,denuncia:11,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Lorran",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:72,atSup:77,auxSup:5,atCid:11,denuncia:57,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Safira",cargo:"SUP.T",situacao:"✅PROMO",aprov:14.3,horas:74,atSup:76,auxSup:100,atCid:174,denuncia:100,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Coutinho",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:20,atSup:14,auxSup:177,atCid:197,denuncia:42,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Carpones",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:70,atSup:55,auxSup:138,atCid:208,denuncia:0,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"GB",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:117,atSup:305,auxSup:257,atCid:374,denuncia:26,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Gomes",cargo:"SUP.T",situacao:"✅PROMO",aprov:57.1,horas:144,atSup:605,auxSup:434,atCid:578,denuncia:124,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Harry",cargo:"SUP.T",situacao:"✅✅PROMO DUPLA",aprov:85.7,horas:157,atSup:699,auxSup:0,atCid:3248,denuncia:121,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Joaquimxz",cargo:"SUP.T",situacao:"✅PROMO",aprov:28.6,horas:105,atSup:265,auxSup:225,atCid:330,denuncia:44,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Kyara",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:123,atSup:354,auxSup:130,atCid:483,denuncia:12,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Mylla",cargo:"SUP.T",situacao:"✅✅PROMO DUPLA",aprov:71.4,horas:157,atSup:776,auxSup:0,atCid:1090,denuncia:166,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Nati",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:118,atSup:306,auxSup:134,atCid:440,denuncia:1,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Paiva",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:105,atSup:339,auxSup:0,atCid:314,denuncia:18,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Pelet",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:16,atSup:29,auxSup:26,atCid:42,denuncia:9,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Raro",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:115,atSup:317,auxSup:247,atCid:362,denuncia:6,aulas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Ximene",cargo:"SUP.T",situacao:"✅✅PROMO DUPLA",aprov:57.1,horas:128,atSup:356,auxSup:158,atCid:625,denuncia:36,aulas:1,ban:0,telagem:0,ticketSS:0}
-        ];
-
-        let moderadores = [
-            {nome:"Marcola",cargo:"MOD",situacao:"✅PROMO",premio:"SIM",aprov:44.4,horas:95,atSup:106,auxSup:167,atCid:9,denuncia:128,revisao:157,instrucoes:0,entrevistas:0,ban:0,telagem:0,ticketSS:0},
-            {nome:"Marco",cargo:"MOD",situacao:"✅PROMO",premio:"SIM",aprov:155.6,horas:176,atSup:164,auxSup:397,atCid:1776,denuncia:212,revisao:331,instrucoes:7,entrevistas:6,ban:0,telagem:0,ticketSS:0},
-            {nome:"Eve",cargo:"MOD",situacao:"✅PROMO",premio:"SIM",aprov:44.4,horas:68,atSup:38,auxSup:115,atCid:6,denuncia:200,revisao:107,instrucoes:2,entrevistas:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Richard",cargo:"MOD.T",situacao:"✅PROMO",premio:"NÃO",aprov:11.1,horas:140,atSup:9,auxSup:49,atCid:1,denuncia:43,revisao:94,instrucoes:0,entrevistas:0,ban:0,telagem:0,ticketSS:0},
-            {nome:"Tsujiro",cargo:"MOD.T",situacao:"✅PROMO",premio:"SIM",aprov:144.4,horas:140,atSup:85,auxSup:184,atCid:582,denuncia:186,revisao:204,instrucoes:13,entrevistas:6,ban:0,telagem:0,ticketSS:0},
-            {nome:"Lord",cargo:"MOD.T",situacao:"✅PROMO",premio:"SIM",aprov:44.4,horas:132,atSup:58,auxSup:203,atCid:36,denuncia:98,revisao:142,instrucoes:0,entrevistas:0,ban:0,telagem:0,ticketSS:0},
-            {nome:"Duda",cargo:"MOD.T",situacao:"✅PROMO",premio:"NÃO",aprov:11.1,horas:87,atSup:53,auxSup:104,atCid:139,denuncia:72,revisao:102,instrucoes:0,entrevistas:0,ban:0,telagem:0,ticketSS:0}
-        ];
-
-        let admins = [
-            {nome:"Wolfy",cargo:"ADM",situacao:"✳️MANTÉM",premio:"NÃO",aprov:0,horas:90,atSup:12,auxSup:71,atCid:0,denuncia:12,revisao:3,instrucoes:1,entrevistas:0,devolucoes:7,ban:0,telagem:0,ticketSS:0},
-            {nome:"Bryan TL",cargo:"ADM",situacao:"EM ANÁLISE",premio:"SIM",aprov:40,horas:148,atSup:22,auxSup:80,atCid:0,denuncia:24,revisao:86,instrucoes:7,entrevistas:4,devolucoes:110,ban:0,telagem:0,ticketSS:0},
-            {nome:"Myra",cargo:"ADM",situacao:"✳️MANTÉM",premio:"SIM",aprov:60,horas:127,atSup:66,auxSup:230,atCid:70,denuncia:76,revisao:193,instrucoes:0,entrevistas:2,devolucoes:70,ban:0,telagem:0,ticketSS:0},
-            {nome:"Forever",cargo:"ADM",situacao:"✳️MANTÉM",premio:"SIM",aprov:60,horas:97,atSup:60,auxSup:92,atCid:4,denuncia:81,revisao:87,instrucoes:5,entrevistas:7,devolucoes:58,ban:0,telagem:0,ticketSS:0},
-            {nome:"Caca",cargo:"ADM",situacao:"✳️MANTÉM",premio:"SIM",aprov:30,horas:66,atSup:95,auxSup:111,atCid:34,denuncia:39,revisao:184,instrucoes:1,entrevistas:0,devolucoes:82,ban:0,telagem:0,ticketSS:0},
-            {nome:"Tanaka",cargo:"ADM.T",situacao:"✅PROMO",premio:"SIM",aprov:30,horas:105,atSup:42,auxSup:120,atCid:0,denuncia:21,revisao:104,instrucoes:2,entrevistas:1,devolucoes:57,ban:0,telagem:0,ticketSS:0},
-            {nome:"Ninja",cargo:"ADM.T",situacao:"❎REBAIXADO",premio:"NÃO",aprov:0,horas:12,atSup:1,auxSup:3,atCid:0,denuncia:30,revisao:60,instrucoes:2,entrevistas:0,devolucoes:16,ban:0,telagem:0,ticketSS:0},
-            {nome:"Guzzman",cargo:"ADM.T",situacao:"✅PROMO",premio:"SIM",aprov:60,horas:85,atSup:11,auxSup:12,atCid:16,denuncia:83,revisao:81,instrucoes:10,entrevistas:13,devolucoes:61,ban:0,telagem:0,ticketSS:0},
-            {nome:"Deyvid",cargo:"ADM.T",situacao:"✅PROMO",premio:"SIM",aprov:120,horas:175,atSup:127,auxSup:300,atCid:3,denuncia:150,revisao:615,instrucoes:0,entrevistas:6,devolucoes:176,ban:0,telagem:0,ticketSS:0}
-        ];
-
-        let supervisores = [
-            {nome:"Cleytin",cargo:"COO",situacao:"✳️MANTÉM",premio:"SIM",aprov:10,horas:139,atSup:0,auxSup:11,atCid:0,denuncia:5,revisao:8,instrucoes:0,entrevistas:0,devolucoes:0,ban:0,telagem:0,ticketSS:0},
-            {nome:"Magic",cargo:"COO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:71,atSup:33,auxSup:61,atCid:0,denuncia:10,revisao:59,instrucoes:0,entrevistas:0,devolucoes:9,ban:0,telagem:0,ticketSS:0},
-            {nome:"Draco",cargo:"COO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:57,atSup:0,auxSup:9,atCid:2,denuncia:2,revisao:33,instrucoes:0,entrevistas:0,devolucoes:0,ban:0,telagem:0,ticketSS:0},
-            {nome:"Renan",cargo:"CM",situacao:"✳️MANTÉM",premio:"SIM",aprov:20,horas:84,atSup:2,auxSup:7,atCid:4,denuncia:38,revisao:220,instrucoes:0,entrevistas:0,devolucoes:18,ban:0,telagem:0,ticketSS:0},
-            {nome:"Neguin",cargo:"CM",situacao:"✳️MANTÉM",premio:"SIM",aprov:20,horas:128,atSup:8,auxSup:110,atCid:19,denuncia:9,revisao:54,instrucoes:0,entrevistas:0,devolucoes:52,ban:3,telagem:0,ticketSS:0},
-            {nome:"Sabrina",cargo:"CM",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:108,atSup:0,auxSup:5,atCid:0,denuncia:7,revisao:69,instrucoes:0,entrevistas:0,devolucoes:1,ban:0,telagem:0,ticketSS:0},
-            {nome:"Vitor",cargo:"CTO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:82,atSup:23,auxSup:137,atCid:4,denuncia:27,revisao:77,instrucoes:0,entrevistas:0,devolucoes:16,ban:1,telagem:0,ticketSS:0},
-            {nome:"Stella",cargo:"CTO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:69,atSup:0,auxSup:8,atCid:0,denuncia:5,revisao:20,instrucoes:0,entrevistas:0,devolucoes:6,ban:0,telagem:0,ticketSS:0},
-            {nome:"Lukinhas",cargo:"CTO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:82,atSup:0,auxSup:29,atCid:4,denuncia:8,revisao:24,instrucoes:0,entrevistas:0,devolucoes:0,ban:21,telagem:0,ticketSS:0},
-            {nome:"Theus",cargo:"SPV",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:53,atSup:10,auxSup:53,atCid:0,denuncia:16,revisao:20,instrucoes:0,entrevistas:0,devolucoes:3,ban:11,telagem:0,ticketSS:0},
-            {nome:"Theo",cargo:"SPV",situacao:"✳️MANTÉM",premio:"SIM",aprov:10,horas:89,atSup:21,auxSup:47,atCid:19,denuncia:14,revisao:70,instrucoes:0,entrevistas:0,devolucoes:76,ban:65,telagem:0,ticketSS:0},
-            {nome:"Biel",cargo:"SPV",situacao:"✳️MANTÉM",premio:"SIM",aprov:10,horas:119,atSup:22,auxSup:45,atCid:2,denuncia:30,revisao:180,instrucoes:0,entrevistas:0,devolucoes:30,ban:3,telagem:0,ticketSS:0}
-        ];
+        let estagiarios = [];
+        let suportes = [];
+        let moderadores = [];
+        let admins = [];
+        let supervisores = [];
 
         let metas = {
             EST: {
@@ -1083,7 +889,7 @@
 
         async function loadData() {
             try {
-                // Tentar carregar do servidor
+                // Carregar SEMPRE do servidor
                 const [estData, supData, modData, admData, spvData, cadData, metData] = await Promise.all([
                     api.get('/estagiarios'),
                     api.get('/suportes'),
@@ -1094,45 +900,19 @@
                     api.get('/metas')
                 ]);
 
-                // Só atualizar se houver dados no servidor
-                if (estData.length > 0) estagiarios = estData;
-                if (supData.length > 0) suportes = supData;
-                if (modData.length > 0) moderadores = modData;
-                if (admData.length > 0) admins = admData;
-                if (spvData.length > 0) supervisores = spvData;
-                if (cadData.length > 0) cadastros = cadData;
+                // Usar dados do servidor (mesmo se vazios)
+                estagiarios = estData || [];
+                suportes = supData || [];
+                moderadores = modData || [];
+                admins = admData || [];
+                supervisores = spvData || [];
+                cadastros = cadData || [];
                 if (Object.keys(metData).length > 0) metas = metData;
 
-                // Se servidor vazio, tentar localStorage
-                if (estData.length === 0 && supData.length === 0) {
-                    const saved = localStorage.getItem('revoada_data');
-                    if (saved) {
-                        const data = JSON.parse(saved);
-                        if (data.estagiarios) estagiarios = data.estagiarios;
-                        if (data.suportes) suportes = data.suportes;
-                        if (data.moderadores) moderadores = data.moderadores;
-                        if (data.admins) admins = data.admins;
-                        if (data.supervisores) supervisores = data.supervisores;
-                        if (data.cadastros) cadastros = data.cadastros;
-                        console.log('Servidor vazio, usando dados do localStorage');
-                    }
-                } else {
-                    console.log('Dados carregados do servidor');
-                }
+                console.log('Dados carregados do servidor');
             } catch (error) {
-                console.warn('Servidor indisponível, usando dados locais:', error.message);
-                // Fallback para localStorage
-                const saved = localStorage.getItem('revoada_data');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    estagiarios = data.estagiarios || estagiarios;
-                    suportes = data.suportes || suportes;
-                    moderadores = data.moderadores || moderadores;
-                    admins = data.admins || admins;
-                    supervisores = data.supervisores || supervisores;
-                    cadastros = data.cadastros || cadastros;
-                    if (data.metas) metas = data.metas;
-                }
+                console.error('Erro ao carregar dados do servidor:', error.message);
+                alert('Erro ao conectar com o servidor. Verifique sua conexão.');
             }
         }
 
