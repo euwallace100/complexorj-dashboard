@@ -1,0 +1,2879 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPLEXO RJ - Dashboard Staff</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0b0d11;
+            --bg-secondary: #111318;
+            --bg-card: #161921;
+            --bg-elevated: #1c1f2a;
+            --bg-hover: #222633;
+            --border: #2a2e3b;
+            --border-light: #353a4a;
+            --text-primary: #e8eaf0;
+            --text-secondary: #8b8fa3;
+            --text-muted: #5c6070;
+            --accent: #6c5ce7;
+            --accent-light: #a29bfe;
+            --accent-glow: rgba(108, 92, 231, 0.25);
+            --success: #00d68f;
+            --success-soft: rgba(0, 214, 143, 0.12);
+            --danger: #ff4757;
+            --danger-soft: rgba(255, 71, 87, 0.12);
+            --warning: #ffc048;
+            --warning-soft: rgba(255, 192, 72, 0.12);
+            --info: #3ea6ff;
+            --info-soft: rgba(62, 166, 255, 0.12);
+            --gold: #f0c040;
+            --silver: #a8b4c4;
+            --bronze: #c48a5c;
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+        .container {
+            max-width: 1520px;
+            margin: 0 auto;
+            padding: 0 24px 24px;
+        }
+
+        /* ── Header ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(11, 13, 17, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 24px;
+            margin: 0 -24px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+        h1 span { color: var(--accent-light); }
+
+        header p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: var(--bg-secondary);
+            padding: 5px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            flex-wrap: wrap;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 9px 18px;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+        }
+
+        .tab:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.35s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, var(--bg-elevated) 0%, var(--bg-card) 100%);
+            border-radius: var(--radius-xl);
+            padding: 0;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-accent, var(--accent));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--card-accent, var(--accent));
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--card-accent, var(--accent));
+        }
+
+        .stat-card.estagiario { --card-accent: #10b981; }
+        .stat-card.suporte { --card-accent: #3b82f6; }
+        .stat-card.moderador { --card-accent: #f59e0b; }
+        .stat-card.admin { --card-accent: #ef4444; }
+
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-accent, var(--accent));
+            color: var(--card-accent, var(--accent));
+        }
+
+        .stat-card-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .stat-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--card-accent, var(--text-primary));
+            line-height: 1;
+        }
+
+        .stat-value-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-card-body {
+            padding: 16px 20px 20px;
+        }
+
+        .stat-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-metric {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.2s ease;
+        }
+
+        .stat-metric:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--card-accent, var(--accent));
+        }
+
+        .stat-metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .stat-metric-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+
+        /* ── Tables ── */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 11px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.82rem;
+        }
+
+        th {
+            background: var(--bg-elevated);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tbody tr { transition: background 0.15s; }
+        tbody tr:hover { background: var(--bg-hover); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        /* ── Editable Inputs ── */
+        .editable {
+            background: var(--bg-primary);
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            transition: all 0.2s ease;
+        }
+
+        .editable:hover { border-color: var(--border-light); }
+
+        .editable:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+            background: var(--bg-card);
+        }
+
+        input[type="number"].editable {
+            width: 72px;
+            text-align: center;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+        }
+
+        /* ── Badges ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-promo { background: var(--success-soft); color: var(--success); border: 1px solid rgba(0,214,143,0.2); }
+        .badge-promo-dupla { background: rgba(240,192,64,0.12); color: var(--gold); border: 1px solid rgba(240,192,64,0.2); }
+        .badge-mantem { background: var(--info-soft); color: var(--info); border: 1px solid rgba(62,166,255,0.2); }
+        .badge-exonerado { background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(255,71,87,0.2); }
+        .badge-analise { background: var(--warning-soft); color: var(--warning); border: 1px solid rgba(255,192,72,0.2); }
+        .badge-rebaixado { background: rgba(255,107,53,0.12); color: #ff6b35; border: 1px solid rgba(255,107,53,0.2); }
+
+        /* ── Progress ── */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--info));
+            border-radius: 100px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0;
+        }
+
+        .progress-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* ── Ranking ── */
+        .ranking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            margin-bottom: 6px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .ranking-item:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-light);
+        }
+
+        .rank-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .rank-1 { color: var(--gold); }
+        .rank-2 { color: var(--silver); }
+        .rank-3 { color: var(--bronze); }
+
+        /* ── Controls ── */
+        .search-input, .filter-select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            margin-bottom: 0;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-input::placeholder { color: var(--text-muted); }
+        .filter-select option { background: var(--bg-card); color: var(--text-primary); }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            padding: 9px 20px;
+            background: var(--accent);
+            border: none;
+            border-radius: var(--radius);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: #7c6ef0;
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+
+        .btn-danger {
+            padding: 9px 20px;
+            background: var(--danger);
+            border: none;
+            border-radius: var(--radius);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+        }
+        .btn-danger:hover { background: #e8404f; box-shadow: 0 4px 16px rgba(255,71,87,0.3); }
+
+        .btn-small {
+            padding: 5px 14px;
+            background: var(--danger-soft);
+            border: 1px solid rgba(255,71,87,0.2);
+            border-radius: var(--radius-sm);
+            color: var(--danger);
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-small:hover { background: var(--danger); color: #fff; }
+
+        /* ── Misc ── */
+        .meta-table { margin-bottom: 24px; }
+        .meta-check { font-size: 1rem; }
+
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: var(--text-primary);
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            letter-spacing: -0.01em;
+        }
+
+        .staff-count {
+            background: var(--accent-glow);
+            color: var(--accent-light);
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            display: inline-block;
+            margin-bottom: 16px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            border: 1px solid rgba(108,92,231,0.2);
+        }
+
+        /* ── Auth ── */
+        .auth-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            padding: 14px 18px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+
+        .auth-bar input {
+            padding: 8px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+        .auth-bar input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+
+        .auth-status {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .auth-status::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--danger);
+            display: inline-block;
+        }
+        .auth-status.ok { color: var(--success); }
+        .auth-status.ok::before { background: var(--success); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.1rem; }
+            header { padding: 14px 16px; margin: 0 -16px 16px; }
+            .container { padding: 0 16px 16px; }
+            .tabs { gap: 2px; padding: 4px; }
+            .tab { padding: 7px 12px; font-size: 0.72rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .stat-card-header { padding: 16px 16px 12px; }
+            .stat-card-body { padding: 12px 16px 16px; }
+            .stat-metrics { gap: 8px; }
+            .stat-card-icon { width: 38px; height: 38px; }
+            .stat-card-icon svg { width: 18px; height: 18px; }
+            .stat-value { font-size: 1.6rem; }
+            .ranking-grid { grid-template-columns: 1fr; }
+            .card { padding: 16px; border-radius: var(--radius-lg); }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-metrics { grid-template-columns: repeat(2, 1fr); }
+            .stat-metric[style*="span 2"] { grid-column: span 1 !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>COMPLEXO <span>RJ</span></h1>
+                <p>Sistema de Gestão e Acompanhamento de Performance</p>
+            </div>
+            <div class="controls" style="margin-bottom:0; gap:8px; align-items:center;">
+                <span id="saveIndicator" style="color: #4ade80; font-size: 0.85rem; display: none;">Salvo</span>
+                <button class="btn" onclick="forceSync(this)" style="background: #22c55e;">Salvar</button>
+                <button class="btn" onclick="exportData()">Exportar XLSX</button>
+                <button class="btn" onclick="exportDiscord(this)" style="background: #5865F2;">Exportar Discord</button>
+                <button class="btn-danger" onclick="resetData()">Resetar</button>
+            </div>
+        </header>
+
+        <div class="tabs" id="tabs">
+            <div class="tab active" data-tab="dashboard">DASHBOARD</div>
+            <div class="tab" data-tab="ranking">RANKING</div>
+            <div class="tab" data-tab="cadastros">CADASTROS</div>
+            <div class="tab" data-tab="estagiario">ESTAGIÁRIO</div>
+            <div class="tab" data-tab="suporte">SUPORTE</div>
+            <div class="tab" data-tab="moderador">MODERADOR</div>
+            <div class="tab" data-tab="administrador">ADMINISTRADOR</div>
+            <div class="tab" data-tab="supervisor">SUPERVISOR</div>
+            <div class="tab" data-tab="configmetas">METAS</div>
+            <div class="tab" data-tab="promocoes">PROMOÇÕES</div>
+        </div>
+
+
+        <div id="dashboard" class="tab-content active">
+            <h2 class="section-title">DASHBOARD METAS STAFF REVOADA RJ</h2>
+            <div id="dashboardContent"></div>
+        </div>
+
+        <div id="ranking" class="tab-content">
+            <h2 class="section-title">RANKINGS</h2>
+            <div class="ranking-grid">
+                <div class="card">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">RANKING ATENDIMENTO CIDADE</h3>
+                    <div id="rankingAtCidade"></div>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">RANKING ATENDIMENTO SUPORTE</h3>
+                    <div id="rankingAtSuporte"></div>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">RANKING TICKET DENÚNCIA</h3>
+                    <div id="rankingDenuncia"></div>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">RANKING TICKET REVISÃO</h3>
+                    <div id="rankingRevisao"></div>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">RANKING TELAGEM</h3>
+                    <div id="rankingTelagem"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cadastros" class="tab-content">
+            <h2 class="section-title">CADASTROS</h2>
+            <div class="card">
+                <div class="auth-bar" id="authBar">
+                    <input type="password" id="authPassword" placeholder="Senha de administração...">
+                    <button class="btn" onclick="autenticar()">Entrar</button>
+                    <button class="btn" onclick="desautenticar()" style="display:none" id="btnLogout">Sair</button>
+                    <span class="auth-status" id="authStatus">Bloqueado</span>
+                </div>
+                <div class="controls">
+                    <input type="text" class="search-input" id="searchCadastro" placeholder="Buscar por nome ou ID...">
+                    <select class="filter-select" id="filterCargo">
+                        <option value="">Todos os Cargos</option>
+                    </select>
+                </div>
+                <div id="addStaffPanel" class="card" style="display:none; margin-top:15px; border:1px solid var(--accent); background:var(--bg-elevated);">
+                    <h3 style="color:var(--accent-light); margin-bottom:15px;">Adicionar Novo Staff</h3>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; align-items:end;">
+                        <div>
+                            <label style="display:block; font-size:0.8rem; color:var(--text-secondary); margin-bottom:5px;">ID Discord</label>
+                            <input type="text" id="newStaffId" placeholder="Ex: 474960019352190977" style="width:100%; padding:10px; background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius); color:var(--text-primary); font-family:'Inter',sans-serif; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; color:var(--text-secondary); margin-bottom:5px;">Nome</label>
+                            <input type="text" id="newStaffNome" placeholder="Ex: Cleytin" style="width:100%; padding:10px; background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius); color:var(--text-primary); font-family:'Inter',sans-serif; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; color:var(--text-secondary); margin-bottom:5px;">ID Cidade</label>
+                            <input type="number" id="newStaffCidade" placeholder="Ex: 7" style="width:100%; padding:10px; background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius); color:var(--text-primary); font-family:'Inter',sans-serif; box-sizing:border-box;">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:0.8rem; color:var(--text-secondary); margin-bottom:5px;">Cargo</label>
+                            <select id="newStaffCargo" style="width:100%; padding:10px; background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius); color:var(--text-primary); font-family:'Inter',sans-serif; box-sizing:border-box; cursor:pointer;">
+                                <option value="">Selecione o Cargo</option>
+                                <option value="COO">COO</option>
+                                <option value="CM">CM</option>
+                                <option value="CTO">CTO</option>
+                                <option value="SPV">SPV</option>
+                                <option value="ADM">ADM</option>
+                                <option value="ADM.T">ADM.T</option>
+                                <option value="MOD">MOD</option>
+                                <option value="MOD.T">MOD.T</option>
+                                <option value="SUP">SUP</option>
+                                <option value="SUP.T">SUP.T</option>
+                                <option value="EST">EST</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn" onclick="adicionarStaff()">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container" style="margin-top:15px;">
+                    <table id="cadastrosTable">
+                        <thead>
+                            <tr>
+                                <th>ID Discord</th>
+                                <th>Staff</th>
+                                <th>ID Cidade</th>
+                                <th>Cargo</th>
+                                <th id="thAcoes" style="display:none">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="estagiario" class="tab-content">
+            <h2 class="section-title">ESTAGIÁRIO</h2>
+            <div id="estagiarioContent"></div>
+        </div>
+
+        <div id="suporte" class="tab-content">
+            <h2 class="section-title">SUPORTE</h2>
+            <div id="suporteContent"></div>
+        </div>
+
+        <div id="moderador" class="tab-content">
+            <h2 class="section-title">MODERADOR</h2>
+            <div id="moderadorContent"></div>
+        </div>
+
+        <div id="administrador" class="tab-content">
+            <h2 class="section-title">ADMINISTRADOR</h2>
+            <div id="administradorContent"></div>
+        </div>
+
+        <div id="supervisor" class="tab-content">
+            <h2 class="section-title">SUPERVISOR</h2>
+            <div id="supervisorContent"></div>
+        </div>
+
+        <div id="configmetas" class="tab-content">
+            <h2 class="section-title">CONFIGURAÇÃO DE METAS</h2>
+            <div id="configMetasContent"></div>
+        </div>
+
+        <div id="promocoes" class="tab-content">
+            <h2 class="section-title">PREVIEW DISCORD</h2>
+            <div class="card" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button class="btn" onclick="renderPreviewDiscord()" style="background: #5865F2;">Atualizar Preview</button>
+                    <button class="btn" onclick="copyDiscordText(this)" style="background: #22c55e;">Copiar Texto</button>
+                </div>
+                <div id="discordPreview" style="background: #36393f; color: #dcddde; padding: 20px; border-radius: 8px; font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.5; white-space: pre-wrap; max-height: 600px; overflow-y: auto;">
+                    Clique em "Atualizar Preview" para ver como ficará no Discord
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ══════════════════════════════════════════════════════════════
+        // API CLIENT - Comunicação com Backend
+        // ══════════════════════════════════════════════════════════════
+        const API_BASE = '/api';
+        let authToken = localStorage.getItem('auth_token') || null;
+
+        const api = {
+            async request(endpoint, options = {}) {
+                const url = `${API_BASE}${endpoint}`;
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+                    ...options.headers
+                };
+
+                try {
+                    const response = await fetch(url, { ...options, headers });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Erro na requisição');
+                    }
+                    return data;
+                } catch (error) {
+                    console.error(`API Error [${endpoint}]:`, error);
+                    throw error;
+                }
+            },
+
+            get(endpoint) {
+                return this.request(endpoint, { method: 'GET' });
+            },
+
+            post(endpoint, body) {
+                return this.request(endpoint, { method: 'POST', body: JSON.stringify(body) });
+            },
+
+            patch(endpoint, body) {
+                return this.request(endpoint, { method: 'PATCH', body: JSON.stringify(body) });
+            },
+
+            delete(endpoint) {
+                return this.request(endpoint, { method: 'DELETE' });
+            },
+
+            put(endpoint, body) {
+                return this.request(endpoint, { method: 'PUT', body: JSON.stringify(body) });
+            }
+        };
+
+        // ══════════════════════════════════════════════════════════════
+        // DADOS LOCAIS (fallback e cache)
+        // ══════════════════════════════════════════════════════════════
+        let cadastros = [
+            {id:"474960019352190977",nome:"Cleytin",cidade:7,cargo:"COO"},
+            {id:"564202515277545474",nome:"Magic",cidade:5,cargo:"COO"},
+            {id:"946946868062064640",nome:"Draco",cidade:22,cargo:"COO"},
+            {id:"895440895573377024",nome:"Renan",cidade:8,cargo:"CM"},
+            {id:"1174604150441508951",nome:"Neguin",cidade:6,cargo:"CM"},
+            {id:"332642075046707200",nome:"Sabrina",cidade:9,cargo:"CM"},
+            {id:"313413900655919119",nome:"Vitor",cidade:10,cargo:"CTO"},
+            {id:"1227793981761392661",nome:"Stella",cidade:77,cargo:"CTO"},
+            {id:"584401973441200165",nome:"Lukinhas",cidade:777,cargo:"CTO"},
+            {id:"1113100617557233674",nome:"Theus",cidade:108,cargo:"SPV"},
+            {id:"1199328901973934200",nome:"Theo",cidade:177,cargo:"SPV"},
+            {id:"931238917066338305",nome:"Biel",cidade:21,cargo:"SPV"},
+            {id:"891240468900368386",nome:"Wolfy",cidade:61,cargo:"ADM"},
+            {id:"1101636450904178770",nome:"Bryan TL",cidade:1379,cargo:"ADM"},
+            {id:"1065700375002357761",nome:"Myra",cidade:1027,cargo:"ADM"},
+            {id:"1031310501503840276",nome:"Forever",cidade:1176,cargo:"ADM"},
+            {id:"521404156628434955",nome:"Caca",cidade:2121,cargo:"ADM"},
+            {id:"220031413439823874",nome:"Tanaka",cidade:50,cargo:"ADM.T"},
+            {id:"349561033976709131",nome:"Ninja",cidade:2532,cargo:"ADM.T"},
+            {id:"1053718188594053190",nome:"Guzzman",cidade:1277,cargo:"ADM.T"},
+            {id:"646770495739658240",nome:"Deyvid",cidade:1142,cargo:"ADM.T"},
+            {id:"389554143548669954",nome:"Marcola",cidade:2697,cargo:"MOD"},
+            {id:"1228586456356753418",nome:"Marco",cidade:103,cargo:"MOD"},
+            {id:"1173838707531448340",nome:"Eve",cidade:17,cargo:"MOD"},
+            {id:"908926169573912586",nome:"Richard",cidade:1192,cargo:"MOD.T"},
+            {id:"343567117842513921",nome:"Tsujiro",cidade:1341,cargo:"MOD.T"},
+            {id:"662447781146787865",nome:"Lord",cidade:111,cargo:"MOD.T"},
+            {id:"328272322043576331",nome:"Duda",cidade:1432,cargo:"MOD.T"},
+            {id:"725848962661089360",nome:"Felicia",cidade:1370,cargo:"SUP"},
+            {id:"382577148612968448",nome:"Floripa",cidade:112,cargo:"SUP"},
+            {id:"1268060799696502898",nome:"Grego",cidade:55,cargo:"SUP"},
+            {id:"651764927434063922",nome:"Pitoco",cidade:1312,cargo:"SUP"},
+            {id:"932505145814691850",nome:"Malaka",cidade:19,cargo:"SUP"},
+            {id:"288817972020117505",nome:"Ayla",cidade:16,cargo:"SUP.T"},
+            {id:"1256826056338313217",nome:"Henrique",cidade:244,cargo:"SUP.T"},
+            {id:"796084347102298143",nome:"Maycon",cidade:1883,cargo:"SUP.T"},
+            {id:"1252601661520871424",nome:"Roox",cidade:110,cargo:"SUP.T"},
+            {id:"956257474082644028",nome:"Cruz",cidade:2181,cargo:"SUP.T"},
+            {id:"1270591055112437802",nome:"Yan",cidade:3466,cargo:"SUP.T"},
+            {id:"715060442443284570",nome:"Rafaela",cidade:1153,cargo:"SUP.T"},
+            {id:"241663532872105987",nome:"Lorran",cidade:1066,cargo:"SUP.T"},
+            {id:"761759174530170890",nome:"Safira",cidade:1464,cargo:"SUP.T"},
+            {id:"1161310361769742479",nome:"Coutinho",cidade:1642,cargo:"SUP.T"},
+            {id:"522087737566691328",nome:"Carpones",cidade:137,cargo:"SUP.T"},
+            {id:"541626886158024735",nome:"GB",cidade:1451,cargo:"SUP.T"},
+            {id:"852710786782593024",nome:"Gomes",cidade:34281,cargo:"SUP.T"},
+            {id:"662825251444490251",nome:"Harry",cidade:8119,cargo:"SUP.T"},
+            {id:"1273286833094004915",nome:"Joaquimxz",cidade:222,cargo:"SUP.T"},
+            {id:"480778809491062794",nome:"Kyara",cidade:2134,cargo:"SUP.T"},
+            {id:"1135974604620431451",nome:"Mylla",cidade:5708,cargo:"SUP.T"},
+            {id:"567065849245073419",nome:"Nati",cidade:34279,cargo:"SUP.T"},
+            {id:"1261073720135651350",nome:"Paiva",cidade:40556,cargo:"SUP.T"},
+            {id:"795841410762670210",nome:"Pelet",cidade:1095,cargo:"SUP.T"},
+            {id:"1144583288833454131",nome:"Raro",cidade:555,cargo:"SUP.T"},
+            {id:"1272664554807103549",nome:"Ximene",cidade:3434,cargo:"SUP.T"},
+            {id:"432427208363999232",nome:"Zeca",cidade:7562,cargo:"EST"},
+            {id:"644244264666267680",nome:"West",cidade:1158,cargo:"EST"},
+            {id:"838129474221637682",nome:"Vegas",cidade:2154,cargo:"EST"},
+            {id:"883211948357984286",nome:"TwoSix",cidade:2602,cargo:"EST"},
+            {id:"1181413085408399390",nome:"Trevor",cidade:9413,cargo:"EST"},
+            {id:"1247208438883418122",nome:"THZ",cidade:1625,cargo:"EST"},
+            {id:"481904492611108864",nome:"Tche",cidade:12856,cargo:"EST"},
+            {id:"1110808777147547699",nome:"Scott",cidade:7837,cargo:"EST"},
+            {id:"436674059795824651",nome:"Risoka",cidade:2023,cargo:"EST"},
+            {id:"290652776135000065",nome:"RiCo",cidade:1886,cargo:"EST"},
+            {id:"591325399544496139",nome:"Ramires",cidade:1735,cargo:"EST"},
+            {id:"519246718785552405",nome:"Nunc",cidade:1615,cargo:"EST"},
+            {id:"966790397563121676",nome:"Nox",cidade:2279,cargo:"EST"},
+            {id:"1039683340850167871",nome:"Milena",cidade:25111,cargo:"EST"},
+            {id:"1134227055173697687",nome:"Matheus",cidade:23340,cargo:"EST"},
+            {id:"878535104119582791",nome:"Marys",cidade:1599,cargo:"EST"},
+            {id:"545933593378160652",nome:"Limao",cidade:3479,cargo:"EST"},
+            {id:"268128988176711680",nome:"Leo",cidade:42577,cargo:"EST"},
+            {id:"1233868848277753940",nome:"Lekis",cidade:2778,cargo:"EST"},
+            {id:"631661228975980545",nome:"Jason",cidade:2126,cargo:"EST"},
+            {id:"246336401916952576",nome:"Japa",cidade:1854,cargo:"EST"},
+            {id:"274968502509502464",nome:"James",cidade:1160,cargo:"EST"},
+            {id:"684192249651003402",nome:"Holanda",cidade:4334,cargo:"EST"},
+            {id:"941711154437312533",nome:"Guerra",cidade:9058,cargo:"EST"},
+            {id:"1140370926458908835",nome:"Gbzin",cidade:101,cargo:"EST"},
+            {id:"1213679491625521184",nome:"Gabriel",cidade:1841,cargo:"EST"},
+            {id:"1233431126778052760",nome:"FK Kamal",cidade:1738,cargo:"EST"},
+            {id:"717204428339544104",nome:"Ester",cidade:20497,cargo:"EST"},
+            {id:"801194038871064678",nome:"Dinmy",cidade:2233,cargo:"EST"},
+            {id:"700443993468698664",nome:"Dantas",cidade:25113,cargo:"EST"},
+            {id:"1205929162380935169",nome:"Connor S",cidade:1403,cargo:"EST"},
+            {id:"248570634056105986",nome:"Chaperoso",cidade:1718,cargo:"EST"},
+            {id:"679914264173215753",nome:"Carioca",cidade:2658,cargo:"EST"},
+            {id:"663440263401963546",nome:"Caio",cidade:41356,cargo:"EST"},
+            {id:"1286000579675558008",nome:"Bianca",cidade:5432,cargo:"EST"},
+            {id:"372200798421254155",nome:"Beatriz",cidade:39422,cargo:"EST"},
+            {id:"474963245288128536",nome:"Artemis",cidade:1177,cargo:"EST"}
+        ];
+
+        let estagiarios = [
+            {nome:"Zeca",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:6,atSup:37,chat:0,atCid:24,aulas:1,ban:0},
+            {nome:"West",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:1,atSup:4,chat:0,atCid:9,aulas:1,ban:0},
+            {nome:"Vegas",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:8,atSup:32,chat:22,atCid:59,aulas:1,ban:0},
+            {nome:"TwoSix",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:37,atSup:189,chat:45,atCid:289,aulas:1,ban:0},
+            {nome:"Trevor",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:11,atSup:68,chat:4,atCid:135,aulas:1,ban:0},
+            {nome:"THZ",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
+            {nome:"Tche",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:10,atSup:14,chat:0,atCid:12,aulas:1,ban:0},
+            {nome:"Scott",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:14,atSup:31,chat:2,atCid:107,aulas:1,ban:0},
+            {nome:"Risoka",cargo:"EST",situacao:"✳️MANTÉM",aprov:33.3,horas:42,atSup:181,chat:69,atCid:185,aulas:1,ban:0},
+            {nome:"RiCo",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
+            {nome:"Ramires",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:23,atSup:76,chat:20,atCid:73,aulas:1,ban:0},
+            {nome:"Nunc",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:10,atSup:86,chat:28,atCid:208,aulas:1,ban:0},
+            {nome:"Nox",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
+            {nome:"Milena",cargo:"EST",situacao:"✳️MANTÉM",aprov:33.3,horas:17,atSup:38,chat:34,atCid:393,aulas:1,ban:0},
+            {nome:"Matheus",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:2,atSup:0,chat:2,atCid:31,aulas:1,ban:0},
+            {nome:"Marys",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:29,atSup:70,chat:15,atCid:266,aulas:1,ban:0},
+            {nome:"Limao",cargo:"EST",situacao:"❌EXONERADO",aprov:66.7,horas:29,atSup:183,chat:93,atCid:476,aulas:1,ban:0},
+            {nome:"Leo",cargo:"EST",situacao:"✳️MANTÉM",aprov:33.3,horas:37,atSup:198,chat:6,atCid:330,aulas:1,ban:0},
+            {nome:"Lekis",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:5,atSup:13,chat:10,atCid:28,aulas:1,ban:0},
+            {nome:"Jason",cargo:"EST",situacao:"✅PROMO",aprov:50,horas:19,atSup:16,chat:13,atCid:474,aulas:1,ban:0},
+            {nome:"Japa",cargo:"EST",situacao:"✅PROMO",aprov:50,horas:14,atSup:27,chat:48,atCid:428,aulas:1,ban:0},
+            {nome:"James",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:9,atSup:21,chat:1,atCid:72,aulas:1,ban:0},
+            {nome:"Holanda",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:0,atSup:0,chat:1,atCid:0,aulas:1,ban:0},
+            {nome:"Guerra",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:6,atSup:26,chat:7,atCid:111,aulas:1,ban:0},
+            {nome:"Gbzin",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
+            {nome:"Gabriel",cargo:"EST",situacao:"✅PROMO",aprov:50,horas:31,atSup:228,chat:95,atCid:389,aulas:1,ban:0},
+            {nome:"FK Kamal",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:40,atSup:174,chat:5,atCid:111,aulas:1,ban:0},
+            {nome:"Ester",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:0,atSup:0,chat:0,atCid:0,aulas:1,ban:0},
+            {nome:"Dinmy",cargo:"EST",situacao:"✅PROMO",aprov:33.3,horas:36,atSup:280,chat:53,atCid:231,aulas:1,ban:0},
+            {nome:"Dantas",cargo:"EST",situacao:"✅PROMO",aprov:66.7,horas:135,atSup:93,chat:68,atCid:214,aulas:1,ban:0},
+            {nome:"Connor S",cargo:"EST",situacao:"✅PROMO",aprov:16.7,horas:26,atSup:175,chat:4,atCid:9,aulas:1,ban:0},
+            {nome:"Chaperoso",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:10,atSup:46,chat:16,atCid:101,aulas:1,ban:0},
+            {nome:"Carioca",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:7,atSup:5,chat:0,atCid:19,aulas:1,ban:0},
+            {nome:"Caio",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:9,atSup:74,chat:27,atCid:168,aulas:1,ban:0},
+            {nome:"Bianca",cargo:"EST",situacao:"✅PROMO",aprov:50,horas:33,atSup:128,chat:30,atCid:534,aulas:1,ban:0},
+            {nome:"Beatriz",cargo:"EST",situacao:"❌EXONERADO",aprov:16.7,horas:1,atSup:0,chat:7,atCid:0,aulas:1,ban:0},
+            {nome:"Artemis",cargo:"EST",situacao:"✳️MANTÉM",aprov:16.7,horas:12,atSup:53,chat:2,atCid:213,aulas:1,ban:0}
+        ];
+
+        let suportes = [
+            {nome:"Felicia",cargo:"SUP",situacao:"✅PROMO",aprov:14.3,horas:79,atSup:80,auxSup:14,atCid:153,denuncia:69,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Floripa",cargo:"SUP",situacao:"✳️MANTÉM",aprov:14.3,horas:60,atSup:29,auxSup:36,atCid:59,denuncia:97,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Grego",cargo:"SUP",situacao:"✳️MANTÉM",aprov:14.3,horas:25,atSup:73,auxSup:34,atCid:158,denuncia:47,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Pitoco",cargo:"SUP",situacao:"✅PROMO",aprov:28.6,horas:100,atSup:154,auxSup:41,atCid:163,denuncia:104,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Malaka",cargo:"SUP",situacao:"✅PROMO",aprov:28.6,horas:83,atSup:286,auxSup:21,atCid:387,denuncia:119,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Ayla",cargo:"SUP.T",situacao:"✅PROMO",aprov:71.4,horas:108,atSup:296,auxSup:31,atCid:313,denuncia:127,aulas:1,ban:35,telagem:0,ticketSS:0},
+            {nome:"Henrique",cargo:"SUP.T",situacao:"❌EXONERADO",aprov:14.3,horas:1,atSup:1,auxSup:0,atCid:0,denuncia:0,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Maycon",cargo:"SUP.T",situacao:"✅PROMO",aprov:28.6,horas:87,atSup:149,auxSup:34,atCid:310,denuncia:75,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Roox",cargo:"SUP.T",situacao:"❌EXONERADO",aprov:14.3,horas:0,atSup:0,auxSup:0,atCid:0,denuncia:0,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Cruz",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:46,atSup:47,auxSup:35,atCid:81,denuncia:28,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Yan",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:64,atSup:76,auxSup:79,atCid:143,denuncia:30,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Rafaela",cargo:"SUP.T",situacao:"✅PROMO",aprov:14.3,horas:58,atSup:129,auxSup:14,atCid:72,denuncia:11,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Lorran",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:72,atSup:77,auxSup:5,atCid:11,denuncia:57,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Safira",cargo:"SUP.T",situacao:"✅PROMO",aprov:14.3,horas:74,atSup:76,auxSup:100,atCid:174,denuncia:100,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Coutinho",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:20,atSup:14,auxSup:177,atCid:197,denuncia:42,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Carpones",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:70,atSup:55,auxSup:138,atCid:208,denuncia:0,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"GB",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:117,atSup:305,auxSup:257,atCid:374,denuncia:26,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Gomes",cargo:"SUP.T",situacao:"✅PROMO",aprov:57.1,horas:144,atSup:605,auxSup:434,atCid:578,denuncia:124,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Harry",cargo:"SUP.T",situacao:"✅✅PROMO DUPLA",aprov:85.7,horas:157,atSup:699,auxSup:0,atCid:3248,denuncia:121,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Joaquimxz",cargo:"SUP.T",situacao:"✅PROMO",aprov:28.6,horas:105,atSup:265,auxSup:225,atCid:330,denuncia:44,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Kyara",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:123,atSup:354,auxSup:130,atCid:483,denuncia:12,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Mylla",cargo:"SUP.T",situacao:"✅✅PROMO DUPLA",aprov:71.4,horas:157,atSup:776,auxSup:0,atCid:1090,denuncia:166,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Nati",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:118,atSup:306,auxSup:134,atCid:440,denuncia:1,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Paiva",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:105,atSup:339,auxSup:0,atCid:314,denuncia:18,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Pelet",cargo:"SUP.T",situacao:"✳️MANTÉM",aprov:14.3,horas:16,atSup:29,auxSup:26,atCid:42,denuncia:9,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Raro",cargo:"SUP.T",situacao:"✅PROMO",aprov:42.9,horas:115,atSup:317,auxSup:247,atCid:362,denuncia:6,aulas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Ximene",cargo:"SUP.T",situacao:"✅✅PROMO DUPLA",aprov:57.1,horas:128,atSup:356,auxSup:158,atCid:625,denuncia:36,aulas:1,ban:0,telagem:0,ticketSS:0}
+        ];
+
+        let moderadores = [
+            {nome:"Marcola",cargo:"MOD",situacao:"✅PROMO",premio:"SIM",aprov:44.4,horas:95,atSup:106,auxSup:167,atCid:9,denuncia:128,revisao:157,instrucoes:0,entrevistas:0,ban:0,telagem:0,ticketSS:0},
+            {nome:"Marco",cargo:"MOD",situacao:"✅PROMO",premio:"SIM",aprov:155.6,horas:176,atSup:164,auxSup:397,atCid:1776,denuncia:212,revisao:331,instrucoes:7,entrevistas:6,ban:0,telagem:0,ticketSS:0},
+            {nome:"Eve",cargo:"MOD",situacao:"✅PROMO",premio:"SIM",aprov:44.4,horas:68,atSup:38,auxSup:115,atCid:6,denuncia:200,revisao:107,instrucoes:2,entrevistas:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Richard",cargo:"MOD.T",situacao:"✅PROMO",premio:"NÃO",aprov:11.1,horas:140,atSup:9,auxSup:49,atCid:1,denuncia:43,revisao:94,instrucoes:0,entrevistas:0,ban:0,telagem:0,ticketSS:0},
+            {nome:"Tsujiro",cargo:"MOD.T",situacao:"✅PROMO",premio:"SIM",aprov:144.4,horas:140,atSup:85,auxSup:184,atCid:582,denuncia:186,revisao:204,instrucoes:13,entrevistas:6,ban:0,telagem:0,ticketSS:0},
+            {nome:"Lord",cargo:"MOD.T",situacao:"✅PROMO",premio:"SIM",aprov:44.4,horas:132,atSup:58,auxSup:203,atCid:36,denuncia:98,revisao:142,instrucoes:0,entrevistas:0,ban:0,telagem:0,ticketSS:0},
+            {nome:"Duda",cargo:"MOD.T",situacao:"✅PROMO",premio:"NÃO",aprov:11.1,horas:87,atSup:53,auxSup:104,atCid:139,denuncia:72,revisao:102,instrucoes:0,entrevistas:0,ban:0,telagem:0,ticketSS:0}
+        ];
+
+        let admins = [
+            {nome:"Wolfy",cargo:"ADM",situacao:"✳️MANTÉM",premio:"NÃO",aprov:0,horas:90,atSup:12,auxSup:71,atCid:0,denuncia:12,revisao:3,instrucoes:1,entrevistas:0,devolucoes:7,ban:0,telagem:0,ticketSS:0},
+            {nome:"Bryan TL",cargo:"ADM",situacao:"EM ANÁLISE",premio:"SIM",aprov:40,horas:148,atSup:22,auxSup:80,atCid:0,denuncia:24,revisao:86,instrucoes:7,entrevistas:4,devolucoes:110,ban:0,telagem:0,ticketSS:0},
+            {nome:"Myra",cargo:"ADM",situacao:"✳️MANTÉM",premio:"SIM",aprov:60,horas:127,atSup:66,auxSup:230,atCid:70,denuncia:76,revisao:193,instrucoes:0,entrevistas:2,devolucoes:70,ban:0,telagem:0,ticketSS:0},
+            {nome:"Forever",cargo:"ADM",situacao:"✳️MANTÉM",premio:"SIM",aprov:60,horas:97,atSup:60,auxSup:92,atCid:4,denuncia:81,revisao:87,instrucoes:5,entrevistas:7,devolucoes:58,ban:0,telagem:0,ticketSS:0},
+            {nome:"Caca",cargo:"ADM",situacao:"✳️MANTÉM",premio:"SIM",aprov:30,horas:66,atSup:95,auxSup:111,atCid:34,denuncia:39,revisao:184,instrucoes:1,entrevistas:0,devolucoes:82,ban:0,telagem:0,ticketSS:0},
+            {nome:"Tanaka",cargo:"ADM.T",situacao:"✅PROMO",premio:"SIM",aprov:30,horas:105,atSup:42,auxSup:120,atCid:0,denuncia:21,revisao:104,instrucoes:2,entrevistas:1,devolucoes:57,ban:0,telagem:0,ticketSS:0},
+            {nome:"Ninja",cargo:"ADM.T",situacao:"❎REBAIXADO",premio:"NÃO",aprov:0,horas:12,atSup:1,auxSup:3,atCid:0,denuncia:30,revisao:60,instrucoes:2,entrevistas:0,devolucoes:16,ban:0,telagem:0,ticketSS:0},
+            {nome:"Guzzman",cargo:"ADM.T",situacao:"✅PROMO",premio:"SIM",aprov:60,horas:85,atSup:11,auxSup:12,atCid:16,denuncia:83,revisao:81,instrucoes:10,entrevistas:13,devolucoes:61,ban:0,telagem:0,ticketSS:0},
+            {nome:"Deyvid",cargo:"ADM.T",situacao:"✅PROMO",premio:"SIM",aprov:120,horas:175,atSup:127,auxSup:300,atCid:3,denuncia:150,revisao:615,instrucoes:0,entrevistas:6,devolucoes:176,ban:0,telagem:0,ticketSS:0}
+        ];
+
+        let supervisores = [
+            {nome:"Cleytin",cargo:"COO",situacao:"✳️MANTÉM",premio:"SIM",aprov:10,horas:139,atSup:0,auxSup:11,atCid:0,denuncia:5,revisao:8,instrucoes:0,entrevistas:0,devolucoes:0,ban:0,telagem:0,ticketSS:0},
+            {nome:"Magic",cargo:"COO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:71,atSup:33,auxSup:61,atCid:0,denuncia:10,revisao:59,instrucoes:0,entrevistas:0,devolucoes:9,ban:0,telagem:0,ticketSS:0},
+            {nome:"Draco",cargo:"COO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:57,atSup:0,auxSup:9,atCid:2,denuncia:2,revisao:33,instrucoes:0,entrevistas:0,devolucoes:0,ban:0,telagem:0,ticketSS:0},
+            {nome:"Renan",cargo:"CM",situacao:"✳️MANTÉM",premio:"SIM",aprov:20,horas:84,atSup:2,auxSup:7,atCid:4,denuncia:38,revisao:220,instrucoes:0,entrevistas:0,devolucoes:18,ban:0,telagem:0,ticketSS:0},
+            {nome:"Neguin",cargo:"CM",situacao:"✳️MANTÉM",premio:"SIM",aprov:20,horas:128,atSup:8,auxSup:110,atCid:19,denuncia:9,revisao:54,instrucoes:0,entrevistas:0,devolucoes:52,ban:3,telagem:0,ticketSS:0},
+            {nome:"Sabrina",cargo:"CM",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:108,atSup:0,auxSup:5,atCid:0,denuncia:7,revisao:69,instrucoes:0,entrevistas:0,devolucoes:1,ban:0,telagem:0,ticketSS:0},
+            {nome:"Vitor",cargo:"CTO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:82,atSup:23,auxSup:137,atCid:4,denuncia:27,revisao:77,instrucoes:0,entrevistas:0,devolucoes:16,ban:1,telagem:0,ticketSS:0},
+            {nome:"Stella",cargo:"CTO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:69,atSup:0,auxSup:8,atCid:0,denuncia:5,revisao:20,instrucoes:0,entrevistas:0,devolucoes:6,ban:0,telagem:0,ticketSS:0},
+            {nome:"Lukinhas",cargo:"CTO",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:82,atSup:0,auxSup:29,atCid:4,denuncia:8,revisao:24,instrucoes:0,entrevistas:0,devolucoes:0,ban:21,telagem:0,ticketSS:0},
+            {nome:"Theus",cargo:"SPV",situacao:"✳️MANTÉM",premio:"SIM",aprov:0,horas:53,atSup:10,auxSup:53,atCid:0,denuncia:16,revisao:20,instrucoes:0,entrevistas:0,devolucoes:3,ban:11,telagem:0,ticketSS:0},
+            {nome:"Theo",cargo:"SPV",situacao:"✳️MANTÉM",premio:"SIM",aprov:10,horas:89,atSup:21,auxSup:47,atCid:19,denuncia:14,revisao:70,instrucoes:0,entrevistas:0,devolucoes:76,ban:65,telagem:0,ticketSS:0},
+            {nome:"Biel",cargo:"SPV",situacao:"✳️MANTÉM",premio:"SIM",aprov:10,horas:119,atSup:22,auxSup:45,atCid:2,denuncia:30,revisao:180,instrucoes:0,entrevistas:0,devolucoes:30,ban:3,telagem:0,ticketSS:0}
+        ];
+
+        let metas = {
+            EST: {
+                HORAS: {promocao: 50, premiacao: 100},
+                'AT.SUPORTE': {promocao: 300, premiacao: 400},
+                'CHAT DUVIDAS': {promocao: 50, premiacao: 100},
+                'AT.CIDADE': {promocao: 300, premiacao: 400},
+                AULAS: {promocao: 1, premiacao: 4},
+                'BAN HACK': {promocao: 0, premiacao: 40}
+            },
+            SUP: {
+                HORAS: {promocao: 90, premiacao: 150},
+                'AT.SUPORTE': {promocao: 300, premiacao: 400},
+                'AUX.SUPORTE': {promocao: 150, premiacao: 250},
+                'AT.CIDADE': {promocao: 300, premiacao: 500},
+                'TCKT DENUNCIA': {promocao: 120, premiacao: 200},
+                AULAS: {promocao: 1, premiacao: 8},
+                'BAN HACK': {promocao: 10, premiacao: 30}
+            },
+            MOD: {
+                HORAS: {promocao: 100, premiacao: 180},
+                'AT.SUPORTE': {promocao: 60, premiacao: 150},
+                'AUX.SUPORTE': {promocao: 150, premiacao: 250},
+                'AT.CIDADE': {promocao: 200, premiacao: 400},
+                'TCKT DENUNCIA': {promocao: 80, premiacao: 150},
+                'TCKT REVISÃO': {promocao: 100, premiacao: 200},
+                'INSTRUÇÕES': {promocao: 5, premiacao: 10}
+            },
+            ADM: {
+                HORAS: {promocao: 120, premiacao: 200},
+                'AT.SUPORTE': {promocao: 60, premiacao: 150},
+                'AUX.SUPORTE': {promocao: 200, premiacao: 300},
+                'AT.CIDADE': {promocao: 100, premiacao: 200},
+                'TCKT DENUNCIA': {promocao: 80, premiacao: 150},
+                'TCKT REVISÃO': {promocao: 100, premiacao: 200},
+                'INSTRUÇÕES': {promocao: 5, premiacao: 10}
+            },
+            SPV: {
+                HORAS: {promocao: 50, premiacao: 100},
+                'AT.SUPORTE': {promocao: 30, premiacao: 60},
+                'AUX.SUPORTE': {promocao: 50, premiacao: 100},
+                'AT.CIDADE': {promocao: 50, premiacao: 100},
+                'TCKT DENUNCIA': {promocao: 20, premiacao: 50},
+                'TCKT REVISÃO': {promocao: 50, premiacao: 100},
+                'INSTRUÇÕES': {promocao: 0, premiacao: 5}
+            }
+        };
+
+        async function loadData() {
+            try {
+                // Tentar carregar do servidor
+                const [estData, supData, modData, admData, spvData, cadData, metData] = await Promise.all([
+                    api.get('/estagiarios'),
+                    api.get('/suportes'),
+                    api.get('/moderadores'),
+                    api.get('/admins'),
+                    api.get('/supervisores'),
+                    api.get('/cadastros'),
+                    api.get('/metas')
+                ]);
+
+                // Só atualizar se houver dados no servidor
+                if (estData.length > 0) estagiarios = estData;
+                if (supData.length > 0) suportes = supData;
+                if (modData.length > 0) moderadores = modData;
+                if (admData.length > 0) admins = admData;
+                if (spvData.length > 0) supervisores = spvData;
+                if (cadData.length > 0) cadastros = cadData;
+                if (Object.keys(metData).length > 0) metas = metData;
+
+                // Se servidor vazio, tentar localStorage
+                if (estData.length === 0 && supData.length === 0) {
+                    const saved = localStorage.getItem('revoada_data');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        if (data.estagiarios) estagiarios = data.estagiarios;
+                        if (data.suportes) suportes = data.suportes;
+                        if (data.moderadores) moderadores = data.moderadores;
+                        if (data.admins) admins = data.admins;
+                        if (data.supervisores) supervisores = data.supervisores;
+                        if (data.cadastros) cadastros = data.cadastros;
+                        console.log('Servidor vazio, usando dados do localStorage');
+                    }
+                } else {
+                    console.log('Dados carregados do servidor');
+                }
+            } catch (error) {
+                console.warn('Servidor indisponível, usando dados locais:', error.message);
+                // Fallback para localStorage
+                const saved = localStorage.getItem('revoada_data');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    estagiarios = data.estagiarios || estagiarios;
+                    suportes = data.suportes || suportes;
+                    moderadores = data.moderadores || moderadores;
+                    admins = data.admins || admins;
+                    supervisores = data.supervisores || supervisores;
+                    cadastros = data.cadastros || cadastros;
+                    if (data.metas) metas = data.metas;
+                }
+            }
+        }
+
+        function saveData() {
+            // Manter localStorage como backup local
+            localStorage.setItem('revoada_data', JSON.stringify({
+                estagiarios, suportes, moderadores, admins, supervisores, cadastros, metas
+            }));
+
+            // Mostrar indicador de salvamento
+            showSaveIndicator('Salvando...', '#fbbf24');
+            setTimeout(() => showSaveIndicator('Salvo', '#4ade80'), 500);
+        }
+
+        function showSaveIndicator(text, color) {
+            const indicator = document.getElementById('saveIndicator');
+            if (indicator) {
+                indicator.textContent = text;
+                indicator.style.color = color;
+                indicator.style.display = 'inline';
+
+                // Esconder após 3 segundos se for "Salvo"
+                if (text === 'Salvo') {
+                    setTimeout(() => { indicator.style.display = 'none'; }, 3000);
+                }
+            }
+        }
+
+        // Forçar sincronização com o servidor
+        async function forceSync(btn) {
+            const originalText = btn.textContent;
+            btn.textContent = 'Salvando...';
+            btn.disabled = true;
+            showSaveIndicator('Salvando...', '#fbbf24');
+
+            // Salvar localmente primeiro
+            saveData();
+
+            // Se não estiver autenticado ou sem token, salvar apenas localmente
+            if (!isAutenticado || !authToken) {
+                showSaveIndicator('Salvo localmente!', '#4ade80');
+                alert('Dados salvos localmente!\n\nPara sincronizar com o servidor, faça login com a senha de administração.');
+                btn.textContent = originalText;
+                btn.disabled = false;
+                return;
+            }
+
+            try {
+                const data = {estagiarios, suportes, moderadores, admins, supervisores, cadastros, metas};
+                await api.post('/export/import', data);
+                showSaveIndicator('Sincronizado!', '#4ade80');
+                alert('Dados salvos no servidor com sucesso!');
+            } catch (error) {
+                showSaveIndicator('Salvo localmente', '#fbbf24');
+                alert('Dados salvos localmente!\n\nErro ao sincronizar com servidor: ' + error.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Funções de update via API
+        async function apiUpdateEstagiario(id, field, value) {
+            if (!isAutenticado) return;
+            try {
+                const val = field === 'discord_id' ? value : (parseInt(value) || 0);
+                await api.patch(`/estagiarios/${id}`, { [field]: val });
+            } catch (error) {
+                console.error('Erro ao atualizar estagiário:', error);
+            }
+        }
+
+        async function apiUpdateSuporte(id, field, value) {
+            if (!isAutenticado) return;
+            try {
+                const val = field === 'discord_id' ? value : (parseInt(value) || 0);
+                await api.patch(`/suportes/${id}`, { [field]: val });
+            } catch (error) {
+                console.error('Erro ao atualizar suporte:', error);
+            }
+        }
+
+        async function apiUpdateModerador(id, field, value) {
+            if (!isAutenticado) return;
+            try {
+                const val = field === 'discord_id' ? value : (parseInt(value) || 0);
+                await api.patch(`/moderadores/${id}`, { [field]: val });
+            } catch (error) {
+                console.error('Erro ao atualizar moderador:', error);
+            }
+        }
+
+        async function apiUpdateAdmin(id, field, value) {
+            if (!isAutenticado) return;
+            try {
+                const val = field === 'discord_id' ? value : (parseInt(value) || 0);
+                await api.patch(`/admins/${id}`, { [field]: val });
+            } catch (error) {
+                console.error('Erro ao atualizar admin:', error);
+            }
+        }
+
+        async function apiUpdateSupervisor(id, field, value) {
+            if (!isAutenticado) return;
+            try {
+                const val = field === 'discord_id' ? value : (parseInt(value) || 0);
+                await api.patch(`/supervisores/${id}`, { [field]: val });
+            } catch (error) {
+                console.error('Erro ao atualizar supervisor:', error);
+            }
+        }
+
+        async function apiUpdateSituacao(endpoint, id, value) {
+            if (!isAutenticado) return;
+            try {
+                await api.patch(`/${endpoint}/${id}`, { situacao: value });
+            } catch (error) {
+                console.error('Erro ao atualizar situação:', error);
+            }
+        }
+
+        async function exportData() {
+            // Usar dados em memória
+            const data = {estagiarios, suportes, moderadores, admins, supervisores};
+
+            // Criar workbook
+            const wb = XLSX.utils.book_new();
+
+            // Aba Estagiários
+            const estData = estagiarios.map(e => ({
+                Nome: e.nome, Cargo: e.cargo, Situação: e.situacao, 'Discord ID': e.discord_id || '',
+                Horas: e.horas, 'At.Suporte': e.atSup, 'Chat Dúvidas': e.chat, 'At.Cidade': e.atCid,
+                Aulas: e.aulas, 'Ban Hack': e.ban
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(estData), 'Estagiários');
+
+            // Aba Suportes
+            const supData = suportes.map(s => ({
+                Nome: s.nome, Cargo: s.cargo, Situação: s.situacao, Prêmio: s.premio || 'NÃO', 'Discord ID': s.discord_id || '',
+                Horas: s.horas, 'At.Suporte': s.atSup, 'Aux.Suporte': s.auxSup, 'At.Cidade': s.atCid,
+                Denúncia: s.denuncia, Aulas: s.aulas, 'Ban Hack': s.ban, Telagem: s.telagem, 'Ticket SS': s.ticketSS
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(supData), 'Suportes');
+
+            // Aba Moderadores
+            const modData = moderadores.map(m => ({
+                Nome: m.nome, Cargo: m.cargo, Situação: m.situacao, Prêmio: m.premio || 'NÃO', 'Discord ID': m.discord_id || '',
+                Horas: m.horas, 'At.Suporte': m.atSup, 'Aux.Suporte': m.auxSup, 'At.Cidade': m.atCid,
+                Denúncia: m.denuncia, Revisão: m.revisao, Instruções: m.instrucoes, Entrevistas: m.entrevistas,
+                'Ban Hack': m.ban, Telagem: m.telagem, 'Ticket SS': m.ticketSS
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(modData), 'Moderadores');
+
+            // Aba Admins
+            const admData = admins.map(a => ({
+                Nome: a.nome, Cargo: a.cargo, Situação: a.situacao, Prêmio: a.premio || 'NÃO', 'Discord ID': a.discord_id || '',
+                Horas: a.horas, 'At.Suporte': a.atSup, 'Aux.Suporte': a.auxSup, 'At.Cidade': a.atCid,
+                Denúncia: a.denuncia, Revisão: a.revisao, Instruções: a.instrucoes, Entrevistas: a.entrevistas,
+                Devoluções: a.devolucoes, 'Ban Hack': a.ban, Telagem: a.telagem, 'Ticket SS': a.ticketSS
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(admData), 'Administradores');
+
+            // Aba Supervisores
+            const spvData = supervisores.map(s => ({
+                Nome: s.nome, Cargo: s.cargo, Situação: s.situacao, Prêmio: s.premio || 'NÃO', 'Discord ID': s.discord_id || '',
+                Horas: s.horas, 'At.Suporte': s.atSup, 'Aux.Suporte': s.auxSup, 'At.Cidade': s.atCid,
+                Denúncia: s.denuncia, Revisão: s.revisao, Instruções: s.instrucoes, Entrevistas: s.entrevistas,
+                Devoluções: s.devolucoes, 'Ban Hack': s.ban, Telagem: s.telagem, 'Ticket SS': s.ticketSS
+            }));
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(spvData), 'Supervisores');
+
+            // Baixar arquivo
+            const fileName = 'complexorj_dashboard_' + new Date().toISOString().split('T')[0] + '.xlsx';
+            XLSX.writeFile(wb, fileName);
+        }
+
+        // Função para copiar com fallback (funciona em HTTP e HTTPS)
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                // Fallback para contextos não-seguros
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                } finally {
+                    textArea.remove();
+                }
+            }
+        }
+
+        // Exportar para formato Discord
+        async function exportDiscord(btn) {
+            const originalText = btn.textContent;
+            btn.textContent = 'Exportando...';
+            btn.disabled = true;
+
+            try {
+                const texto = generateDiscordText();
+                await copyToClipboard(texto);
+                alert('Texto copiado para a área de transferência!');
+            } catch (error) {
+                console.error('Erro ao exportar para Discord:', error);
+                alert('Erro ao exportar: ' + error.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Importar dados para o servidor
+        async function importToServer(data) {
+            if (!isAutenticado) {
+                alert('Você precisa estar autenticado para importar dados!');
+                return false;
+            }
+            try {
+                await api.post('/export/import', data);
+                alert('Dados importados para o servidor com sucesso!');
+                await loadData();
+                renderDashboard();
+                renderRanking();
+                renderCadastros();
+                renderEstagiariosTable();
+                renderSuportesTable();
+                renderModeradoresTable();
+                renderAdminsTable();
+                renderSupervisoresTable();
+                renderConfigMetas();
+                return true;
+            } catch (error) {
+                console.error('Erro ao importar:', error);
+                alert('Erro ao importar dados para o servidor: ' + error.message);
+                return false;
+            }
+        }
+
+        function resetData() {
+            if (confirm('Tem certeza que deseja ZERAR todas as métricas (horas, atendimentos, etc.) de todos os staffs?\n\nIsso NÃO apaga os staffs, apenas zera os números.')) {
+                // Zerar métricas de estagiários
+                estagiarios.forEach(e => {
+                    e.horas = 0; e.atSup = 0; e.chat = 0; e.atCid = 0; e.aulas = 0; e.ban = 0;
+                    e.situacao = '✳️MANTÉM';
+                });
+
+                // Zerar métricas de suportes
+                suportes.forEach(s => {
+                    s.horas = 0; s.atSup = 0; s.auxSup = 0; s.atCid = 0; s.denuncia = 0;
+                    s.aulas = 0; s.ban = 0; s.telagem = 0; s.ticketSS = 0;
+                    s.situacao = '✳️MANTÉM'; s.premio = 'NÃO';
+                });
+
+                // Zerar métricas de moderadores
+                moderadores.forEach(m => {
+                    m.horas = 0; m.atSup = 0; m.auxSup = 0; m.atCid = 0; m.denuncia = 0;
+                    m.revisao = 0; m.instrucoes = 0; m.entrevistas = 0; m.ban = 0;
+                    m.telagem = 0; m.ticketSS = 0;
+                    m.situacao = '✳️MANTÉM'; m.premio = 'NÃO';
+                });
+
+                // Zerar métricas de admins
+                admins.forEach(a => {
+                    a.horas = 0; a.atSup = 0; a.auxSup = 0; a.atCid = 0; a.denuncia = 0;
+                    a.revisao = 0; a.instrucoes = 0; a.entrevistas = 0; a.devolucoes = 0;
+                    a.ban = 0; a.telagem = 0; a.ticketSS = 0;
+                    a.situacao = '✳️MANTÉM'; a.premio = 'NÃO';
+                });
+
+                // Zerar métricas de supervisores
+                supervisores.forEach(s => {
+                    s.horas = 0; s.atSup = 0; s.auxSup = 0; s.atCid = 0; s.denuncia = 0;
+                    s.revisao = 0; s.instrucoes = 0; s.entrevistas = 0; s.devolucoes = 0;
+                    s.ban = 0; s.telagem = 0; s.ticketSS = 0;
+                    s.situacao = '✳️MANTÉM'; s.premio = 'NÃO';
+                });
+
+                saveData();
+                renderDashboard();
+                renderEstagiariosTable();
+                renderSuportesTable();
+                renderModeradoresTable();
+                renderAdminsTable();
+                renderSupervisoresTable();
+                alert('Métricas zeradas com sucesso!');
+            }
+        }
+
+        function getSituacaoBadge(situacao) {
+            if (situacao.includes('✅✅PROMO DUPLA')) return 'badge-promo-dupla';
+            if (situacao.includes('✅PROMO')) return 'badge-promo';
+            if (situacao.includes('✳️MANTÉM')) return 'badge-mantem';
+            if (situacao.includes('❌EXONERADO')) return 'badge-exonerado';
+            if (situacao.includes('EM ANÁLISE')) return 'badge-analise';
+            if (situacao.includes('❎REBAIXADO')) return 'badge-rebaixado';
+            return 'badge-mantem';
+        }
+
+        const SITUACOES = ['✅✅PROMO DUPLA','✅PROMO','✳️MANTÉM','❌EXONERADO','EM ANÁLISE','❎REBAIXADO'];
+        const PREMIOS = ['SIM', 'NÃO'];
+
+        // Cargos por categoria
+        const CARGOS = {
+            estagiarios: ['EST', 'EST.T'],
+            suportes: ['SUP', 'SUP.T'],
+            moderadores: ['MOD', 'MOD.T'],
+            admins: ['ADM', 'ADM.T'],
+            supervisores: ['SPV', 'SPV.T', 'CTO', 'CM', 'COO', 'CEO']
+        };
+
+        const ALL_CARGOS = ['EST', 'EST.T', 'SUP', 'SUP.T', 'MOD', 'MOD.T', 'ADM', 'ADM.T', 'SPV', 'SPV.T', 'CTO', 'CM', 'COO', 'CEO'];
+
+        function cargoSelect(arrayName, idx, current) {
+            return `<select class="editable" style="min-width:70px" onchange="updateCargo('${arrayName}',${idx},this.value)">
+                ${ALL_CARGOS.map(c => `<option value="${c}" ${c===current?'selected':''}>${c}</option>`).join('')}
+            </select>`;
+        }
+
+        function updateCargo(arrayName, idx, value) {
+            const arrays = {estagiarios, suportes, moderadores, admins, supervisores};
+            arrays[arrayName][idx].cargo = value;
+            saveData();
+            const rerender = {
+                estagiarios: renderEstagiariosTable,
+                suportes: renderSuportesTable,
+                moderadores: renderModeradoresTable,
+                admins: renderAdminsTable,
+                supervisores: renderSupervisoresTable
+            };
+            rerender[arrayName]();
+
+            // Atualizar via API
+            const id = arrays[arrayName][idx].id;
+            if (id) {
+                const endpoints = {estagiarios:'estagiarios', suportes:'suportes', moderadores:'moderadores', admins:'admins', supervisores:'supervisores'};
+                api.patch(`/${endpoints[arrayName]}/${id}`, { cargo: value }).catch(err => console.error('Erro ao atualizar cargo:', err));
+            }
+        }
+
+        function situacaoSelect(arrayName, idx, current) {
+            return `<select class="editable" style="min-width:140px" onchange="updateSituacao('${arrayName}',${idx},this.value)">
+                ${SITUACOES.map(s => `<option value="${s}" ${s===current?'selected':''}>${s}</option>`).join('')}
+            </select>`;
+        }
+
+        function premioSelect(arrayName, idx, current) {
+            return `<select class="editable" style="min-width:80px" onchange="updatePremio('${arrayName}',${idx},this.value)">
+                ${PREMIOS.map(p => `<option value="${p}" ${p===current?'selected':''}>${p}</option>`).join('')}
+            </select>`;
+        }
+
+        function updateSituacao(arrayName, idx, value) {
+            const arrays = {estagiarios, suportes, moderadores, admins, supervisores};
+            arrays[arrayName][idx].situacao = value;
+            saveData();
+            const rerender = {
+                estagiarios: renderEstagiariosTable,
+                suportes: renderSuportesTable,
+                moderadores: renderModeradoresTable,
+                admins: renderAdminsTable,
+                supervisores: renderSupervisoresTable
+            };
+            rerender[arrayName]();
+
+            // Atualizar via API
+            const id = arrays[arrayName][idx].id;
+            if (id) apiUpdateSituacao(arrayName, id, value);
+        }
+
+        function updatePremio(arrayName, idx, value) {
+            const arrays = {suportes, moderadores, admins, supervisores};
+            arrays[arrayName][idx].premio = value;
+            saveData();
+            const rerender = {
+                suportes: renderSuportesTable,
+                moderadores: renderModeradoresTable,
+                admins: renderAdminsTable,
+                supervisores: renderSupervisoresTable
+            };
+            rerender[arrayName]();
+            renderDashboard();
+
+            // Atualizar via API
+            const id = arrays[arrayName][idx].id;
+            if (id) apiUpdatePremio(arrayName, id, value);
+        }
+
+        async function apiUpdatePremio(endpoint, id, value) {
+            if (!isAutenticado) return;
+            try {
+                await api.patch(`/${endpoint}/${id}`, { premio: value });
+            } catch (error) {
+                console.error('Erro ao atualizar prêmio:', error);
+            }
+        }
+
+        function calcAprov(staff, metasCargo) {
+            const fields = {
+                HORAS:'horas', 'AT.SUPORTE':'atSup', 'AUX.SUPORTE':'auxSup',
+                'CHAT DUVIDAS':'chat', 'AT.CIDADE':'atCid', 'TCKT DENUNCIA':'denuncia',
+                'TCKT REVISÃO':'revisao', AULAS:'aulas', 'BAN HACK':'ban', 'INSTRUÇÕES':'instrucoes'
+            };
+            const metricas = Object.keys(metasCargo);
+            if (metricas.length === 0) return 0;
+            let atingidas = 0;
+            metricas.forEach(m => {
+                const field = fields[m];
+                if (field && (staff[field] || 0) >= metasCargo[m].promocao) atingidas++;
+            });
+            return Math.round((atingidas / metricas.length) * 100 * 10) / 10;
+        }
+
+        function renderDashboard() {
+            const estTotals = {horas:0, atSup:0, chat:0, atCid:0};
+            const supTotals = {horas:0, atSup:0, auxSup:0, atCid:0, denuncia:0, ban:0};
+            const modTotals = {horas:0, atSup:0, auxSup:0, atCid:0, denuncia:0, revisao:0, instrucoes:0};
+            const admTotals = {horas:0, atSup:0, auxSup:0, atCid:0, denuncia:0, revisao:0, devolucoes:0, instrucoes:0};
+
+            estagiarios.forEach(e => {
+                estTotals.horas += e.horas;
+                estTotals.atSup += e.atSup;
+                estTotals.chat += e.chat;
+                estTotals.atCid += e.atCid;
+            });
+
+            suportes.forEach(s => {
+                supTotals.horas += s.horas;
+                supTotals.atSup += s.atSup;
+                supTotals.auxSup += s.auxSup;
+                supTotals.atCid += s.atCid;
+                supTotals.denuncia += s.denuncia;
+                supTotals.ban += s.ban;
+            });
+
+            moderadores.forEach(m => {
+                modTotals.horas += m.horas;
+                modTotals.atSup += m.atSup;
+                modTotals.auxSup += m.auxSup;
+                modTotals.atCid += m.atCid;
+                modTotals.denuncia += m.denuncia;
+                modTotals.revisao += m.revisao;
+                modTotals.instrucoes += m.instrucoes;
+            });
+
+            [...admins, ...supervisores].forEach(a => {
+                admTotals.horas += a.horas;
+                admTotals.atSup += a.atSup;
+                admTotals.auxSup += a.auxSup;
+                admTotals.atCid += a.atCid;
+                admTotals.denuncia += a.denuncia;
+                admTotals.revisao += a.revisao;
+                admTotals.devolucoes += a.devolucoes || 0;
+                admTotals.instrucoes += a.instrucoes;
+            });
+
+            const grandTotal = {
+                horas: estTotals.horas + supTotals.horas + modTotals.horas + admTotals.horas,
+                atSup: estTotals.atSup + supTotals.atSup + modTotals.atSup + admTotals.atSup,
+                auxSup: supTotals.auxSup + modTotals.auxSup + admTotals.auxSup,
+                chat: estTotals.chat,
+                atCid: estTotals.atCid + supTotals.atCid + modTotals.atCid + admTotals.atCid,
+                denuncia: supTotals.denuncia + modTotals.denuncia + admTotals.denuncia,
+                revisao: modTotals.revisao + admTotals.revisao,
+                ban: supTotals.ban,
+                devolucoes: admTotals.devolucoes,
+                instrucoes: modTotals.instrucoes + admTotals.instrucoes
+            };
+
+            document.getElementById('dashboardContent').innerHTML = `
+                <div class="stats-grid">
+                    <!-- ESTAGIÁRIO Card -->
+                    <div class="stat-card estagiario">
+                        <div class="stat-card-header">
+                            <div class="stat-card-header-left">
+                                <div class="stat-card-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="stat-title">Estagiário</div>
+                                    <div class="stat-value">${estagiarios.length}</div>
+                                </div>
+                            </div>
+                            <div class="stat-value-label">membros</div>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-metrics">
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${estTotals.horas.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Horas</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${estTotals.atSup.toLocaleString()}</div>
+                                    <div class="stat-metric-label">At. Suporte</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${estTotals.chat.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Chat</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${estTotals.atCid.toLocaleString()}</div>
+                                    <div class="stat-metric-label">At. Cidade</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUPORTE Card -->
+                    <div class="stat-card suporte">
+                        <div class="stat-card-header">
+                            <div class="stat-card-header-left">
+                                <div class="stat-card-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="stat-title">Suporte</div>
+                                    <div class="stat-value">${suportes.length}</div>
+                                </div>
+                            </div>
+                            <div class="stat-value-label">membros</div>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-metrics">
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${supTotals.horas.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Horas</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${supTotals.atSup.toLocaleString()}</div>
+                                    <div class="stat-metric-label">At. Suporte</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${supTotals.auxSup.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Aux. Suporte</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${supTotals.atCid.toLocaleString()}</div>
+                                    <div class="stat-metric-label">At. Cidade</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${supTotals.denuncia.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Denúncia</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${supTotals.ban.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Ban</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MODERADOR Card -->
+                    <div class="stat-card moderador">
+                        <div class="stat-card-header">
+                            <div class="stat-card-header-left">
+                                <div class="stat-card-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="stat-title">Moderador</div>
+                                    <div class="stat-value">${moderadores.length}</div>
+                                </div>
+                            </div>
+                            <div class="stat-value-label">membros</div>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-metrics">
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${modTotals.horas.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Horas</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${modTotals.atSup.toLocaleString()}</div>
+                                    <div class="stat-metric-label">At. Suporte</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${modTotals.auxSup.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Aux. Suporte</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${modTotals.atCid.toLocaleString()}</div>
+                                    <div class="stat-metric-label">At. Cidade</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${modTotals.denuncia.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Denúncia</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${modTotals.revisao.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Revisão</div>
+                                </div>
+                                <div class="stat-metric" style="grid-column: span 2;">
+                                    <div class="stat-metric-value">${modTotals.instrucoes.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Instruções</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADMINISTRADOR + SUPERVISOR Card -->
+                    <div class="stat-card admin">
+                        <div class="stat-card-header">
+                            <div class="stat-card-header-left">
+                                <div class="stat-card-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="stat-title">Admin + Supervisor</div>
+                                    <div class="stat-value">${admins.length + supervisores.length}</div>
+                                </div>
+                            </div>
+                            <div class="stat-value-label">membros</div>
+                        </div>
+                        <div class="stat-card-body">
+                            <div class="stat-metrics">
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${admTotals.horas.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Horas</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${admTotals.atSup.toLocaleString()}</div>
+                                    <div class="stat-metric-label">At. Suporte</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${admTotals.auxSup.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Aux. Suporte</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${admTotals.atCid.toLocaleString()}</div>
+                                    <div class="stat-metric-label">At. Cidade</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${admTotals.denuncia.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Denúncia</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${admTotals.revisao.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Revisão</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${admTotals.devolucoes.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Devoluções</div>
+                                </div>
+                                <div class="stat-metric">
+                                    <div class="stat-metric-value">${admTotals.instrucoes.toLocaleString()}</div>
+                                    <div class="stat-metric-label">Instruções</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--text-primary); margin-bottom: 20px;">TOTAIS GERAIS</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Métrica</th>
+                                    <th>Total</th>
+                                    <th>Progresso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>HORAS</td>
+                                    <td>${grandTotal.horas}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.horas}</td>
+                                </tr>
+                                <tr>
+                                    <td>AT.SUPORTE</td>
+                                    <td>${grandTotal.atSup}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.atSup}</td>
+                                </tr>
+                                <tr>
+                                    <td>AUX.SUPORTE</td>
+                                    <td>${grandTotal.auxSup}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.auxSup}</td>
+                                </tr>
+                                <tr>
+                                    <td>CHAT DUVIDAS</td>
+                                    <td>${grandTotal.chat}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.chat}</td>
+                                </tr>
+                                <tr>
+                                    <td>AT.CIDADE</td>
+                                    <td>${grandTotal.atCid}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.atCid}</td>
+                                </tr>
+                                <tr>
+                                    <td>TCKT DENUNCIA</td>
+                                    <td>${grandTotal.denuncia}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.denuncia}</td>
+                                </tr>
+                                <tr>
+                                    <td>TCKT REVISÃO</td>
+                                    <td>${grandTotal.revisao}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.revisao}</td>
+                                </tr>
+                                <tr>
+                                    <td>BAN HACK</td>
+                                    <td>${grandTotal.ban}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.ban}</td>
+                                </tr>
+                                <tr>
+                                    <td>DEVOLUÇÕES</td>
+                                    <td>${grandTotal.devolucoes}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.devolucoes}</td>
+                                </tr>
+                                <tr>
+                                    <td>INSTRUÇÕES</td>
+                                    <td>${grandTotal.instrucoes}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace; font-weight:600;">${grandTotal.instrucoes}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRanking() {
+            const allStaff = [...estagiarios, ...suportes, ...moderadores, ...admins, ...supervisores];
+
+            const rankingCategories = [
+                {id: 'rankingAtCidade', field: 'atCid'},
+                {id: 'rankingAtSuporte', field: 'atSup'},
+                {id: 'rankingDenuncia', field: 'denuncia'},
+                {id: 'rankingRevisao', field: 'revisao'},
+                {id: 'rankingTelagem', field: 'telagem'},
+            ];
+
+            rankingCategories.forEach(cat => {
+                const ranked = allStaff.map(s => ({
+                    nome: s.nome, cargo: s.cargo, total: (s[cat.field] || 0)
+                })).sort((a, b) => b.total - a.total).slice(0, 10);
+
+                document.getElementById(cat.id).innerHTML = ranked.map((s, i) => `
+                    <div class="ranking-item">
+                        <div class="rank-number rank-${i+1}">${i+1}</div>
+                        <div style="flex:1">
+                            <div style="font-weight:600; font-size:0.88rem;">${s.nome}</div>
+                            <div style="font-size:0.72rem; color:var(--text-muted)">${s.cargo}</div>
+                        </div>
+                        <div style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:700; color:var(--accent-light)">${s.total}</div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        const ADMIN_PASSWORD = 'complexorjmagic2026@#$';
+        let isAutenticado = false;
+
+        async function autenticar() {
+            const senha = document.getElementById('authPassword').value;
+
+            try {
+                // Tentar autenticar via API
+                const response = await api.post('/auth/login', { password: senha });
+                if (response.success && response.token) {
+                    authToken = response.token;
+                    localStorage.setItem('auth_token', authToken);
+                    isAutenticado = true;
+                    document.getElementById('authStatus').textContent = 'Autenticado';
+                    document.getElementById('authStatus').className = 'auth-status ok';
+                    document.getElementById('addStaffPanel').style.display = '';
+                    document.getElementById('btnLogout').style.display = '';
+                    document.getElementById('thAcoes').style.display = '';
+                    document.getElementById('authPassword').value = '';
+                    renderCadastrosTable();
+                    return;
+                }
+            } catch (error) {
+                // Fallback para autenticação local
+                if (senha === ADMIN_PASSWORD) {
+                    isAutenticado = true;
+                    document.getElementById('authStatus').textContent = 'Autenticado (offline)';
+                    document.getElementById('authStatus').className = 'auth-status ok';
+                    document.getElementById('addStaffPanel').style.display = '';
+                    document.getElementById('btnLogout').style.display = '';
+                    document.getElementById('thAcoes').style.display = '';
+                    document.getElementById('authPassword').value = '';
+                    renderCadastrosTable();
+                    return;
+                }
+            }
+
+            alert('Senha incorreta!');
+        }
+
+        // Verificar token salvo ao carregar
+        async function checkSavedAuth() {
+            if (authToken) {
+                try {
+                    const response = await api.get('/auth/verify');
+                    if (response.valid) {
+                        isAutenticado = true;
+                        document.getElementById('authStatus').textContent = 'Autenticado';
+                        document.getElementById('authStatus').className = 'auth-status ok';
+                        document.getElementById('addStaffPanel').style.display = '';
+                        document.getElementById('btnLogout').style.display = '';
+                        document.getElementById('thAcoes').style.display = '';
+                        renderCadastrosTable();
+                    }
+                } catch (error) {
+                    localStorage.removeItem('auth_token');
+                    authToken = null;
+                }
+            }
+        }
+
+        function desautenticar() {
+            isAutenticado = false;
+            authToken = null;
+            localStorage.removeItem('auth_token');
+            document.getElementById('authStatus').textContent = 'Bloqueado';
+            document.getElementById('authStatus').className = 'auth-status';
+            document.getElementById('addStaffPanel').style.display = 'none';
+            document.getElementById('btnLogout').style.display = 'none';
+            document.getElementById('thAcoes').style.display = 'none';
+            renderCadastrosTable();
+        }
+
+        async function adicionarStaff() {
+            if (!isAutenticado) return;
+            const discordId = document.getElementById('newStaffId').value.trim();
+            const nome = document.getElementById('newStaffNome').value.trim();
+            const cidade = document.getElementById('newStaffCidade').value.trim();
+            const cargoSelecionado = document.getElementById('newStaffCargo').value;
+
+            if (!discordId || !nome || !cidade || !cargoSelecionado) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+            if (cadastros.some(c => c.id === discordId)) {
+                alert('Já existe um staff com esse ID Discord!');
+                return;
+            }
+
+            // Adicionar ao cadastro geral
+            try {
+                await api.post('/cadastros', { id: discordId, nome, cidade: Number(cidade), cargo: cargoSelecionado });
+                cadastros.push({id: discordId, nome, cidade: Number(cidade), cargo: cargoSelecionado});
+            } catch (error) {
+                cadastros.push({id: discordId, nome, cidade: Number(cidade), cargo: cargoSelecionado});
+            }
+
+            // Adicionar à tabela específica do cargo
+            const cargoMap = {
+                'EST': 'estagiarios', 'EST.T': 'estagiarios',
+                'SUP': 'suportes', 'SUP.T': 'suportes',
+                'MOD': 'moderadores', 'MOD.T': 'moderadores',
+                'ADM': 'admins', 'ADM.T': 'admins',
+                'SPV': 'supervisores', 'SPV.T': 'supervisores',
+                'CTO': 'supervisores', 'CM': 'supervisores',
+                'COO': 'supervisores', 'CEO': 'supervisores'
+            };
+
+            const tabela = cargoMap[cargoSelecionado];
+            if (tabela) {
+                let novoStaff = {
+                    nome: nome,
+                    cargo: cargoSelecionado,
+                    situacao: '✳️MANTÉM',
+                    discord_id: discordId
+                };
+
+                // Adicionar campos específicos por tipo de cargo
+                if (tabela === 'estagiarios') {
+                    novoStaff = {...novoStaff, horas: 0, atSup: 0, chat: 0, atCid: 0, aulas: 0, ban: 0};
+                    estagiarios.push(novoStaff);
+                    try {
+                        const res = await api.post('/estagiarios', novoStaff);
+                        if (res.id) estagiarios[estagiarios.length-1].id = res.id;
+                    } catch(e) { console.warn('Erro ao salvar estagiário no servidor:', e); }
+                    renderEstagiariosTable();
+                }
+                else if (tabela === 'suportes') {
+                    novoStaff = {...novoStaff, premio: 'NÃO', horas: 0, atSup: 0, auxSup: 0, atCid: 0, denuncia: 0, aulas: 0, ban: 0, telagem: 0, ticketSS: 0};
+                    suportes.push(novoStaff);
+                    try {
+                        const res = await api.post('/suportes', novoStaff);
+                        if (res.id) suportes[suportes.length-1].id = res.id;
+                    } catch(e) { console.warn('Erro ao salvar suporte no servidor:', e); }
+                    renderSuportesTable();
+                }
+                else if (tabela === 'moderadores') {
+                    novoStaff = {...novoStaff, premio: 'NÃO', horas: 0, atSup: 0, auxSup: 0, atCid: 0, denuncia: 0, revisao: 0, instrucoes: 0, entrevistas: 0, ban: 0, telagem: 0, ticketSS: 0};
+                    moderadores.push(novoStaff);
+                    try {
+                        const res = await api.post('/moderadores', novoStaff);
+                        if (res.id) moderadores[moderadores.length-1].id = res.id;
+                    } catch(e) { console.warn('Erro ao salvar moderador no servidor:', e); }
+                    renderModeradoresTable();
+                }
+                else if (tabela === 'admins') {
+                    novoStaff = {...novoStaff, premio: 'NÃO', horas: 0, atSup: 0, auxSup: 0, atCid: 0, denuncia: 0, revisao: 0, instrucoes: 0, entrevistas: 0, devolucoes: 0, ban: 0, telagem: 0, ticketSS: 0};
+                    admins.push(novoStaff);
+                    try {
+                        const res = await api.post('/admins', novoStaff);
+                        if (res.id) admins[admins.length-1].id = res.id;
+                    } catch(e) { console.warn('Erro ao salvar admin no servidor:', e); }
+                    renderAdminsTable();
+                }
+                else if (tabela === 'supervisores') {
+                    novoStaff = {...novoStaff, premio: 'NÃO', horas: 0, atSup: 0, auxSup: 0, atCid: 0, denuncia: 0, revisao: 0, instrucoes: 0, entrevistas: 0, devolucoes: 0, ban: 0, telagem: 0, ticketSS: 0};
+                    supervisores.push(novoStaff);
+                    try {
+                        const res = await api.post('/supervisores', novoStaff);
+                        if (res.id) supervisores[supervisores.length-1].id = res.id;
+                    } catch(e) { console.warn('Erro ao salvar supervisor no servidor:', e); }
+                    renderSupervisoresTable();
+                }
+
+                renderDashboard();
+                renderRanking();
+            }
+
+            saveData();
+            document.getElementById('newStaffId').value = '';
+            document.getElementById('newStaffNome').value = '';
+            document.getElementById('newStaffCidade').value = '';
+            document.getElementById('newStaffCargo').value = '';
+            renderCadastros();
+            alert(`${nome} adicionado com sucesso como ${cargoSelecionado}!`);
+        }
+
+        async function removerStaff(id) {
+            if (!isAutenticado) {
+                alert('Você precisa estar autenticado para remover staff!');
+                return;
+            }
+            const staff = cadastros.find(c => c.id === id);
+            if (!staff) return;
+
+            if (confirm(`Tem certeza que deseja remover ${staff.nome}?`)) {
+                try {
+                    await api.delete(`/cadastros/${id}`);
+
+                    // Remover também da tabela específica do cargo
+                    const cargoMap = {
+                        'EST': 'estagiarios', 'EST.T': 'estagiarios',
+                        'SUP': 'suportes', 'SUP.T': 'suportes',
+                        'MOD': 'moderadores', 'MOD.T': 'moderadores',
+                        'ADM': 'admins', 'ADM.T': 'admins',
+                        'SPV': 'supervisores', 'SPV.T': 'supervisores',
+                        'CTO': 'supervisores', 'CM': 'supervisores',
+                        'COO': 'supervisores', 'CEO': 'supervisores'
+                    };
+
+                    const tabela = cargoMap[staff.cargo];
+                    if (tabela) {
+                        // Remover da tabela específica pelo discord_id
+                        const arrays = {estagiarios, suportes, moderadores, admins, supervisores};
+                        const idx = arrays[tabela].findIndex(s => s.discord_id === id);
+                        if (idx !== -1) {
+                            const staffId = arrays[tabela][idx].id;
+                            try {
+                                await api.delete(`/${tabela}/${staffId}`);
+                            } catch(e) { console.warn('Erro ao remover da tabela específica:', e); }
+                            arrays[tabela].splice(idx, 1);
+                        }
+                    }
+
+                    // Só remove localmente após sucesso no servidor
+                    cadastros = cadastros.filter(c => c.id !== id);
+                    saveData();
+                    renderCadastros();
+                    renderDashboard();
+                    alert(`${staff.nome} removido com sucesso!`);
+                } catch (error) {
+                    console.error('Erro ao remover do servidor:', error);
+                    alert(`Erro ao remover ${staff.nome}: ${error.message}\nVerifique se você está autenticado.`);
+                }
+            }
+        }
+
+        function renderCadastrosTable() {
+            const search = document.getElementById('searchCadastro').value.toLowerCase();
+            const filter = document.getElementById('filterCargo').value;
+
+            const filtered = cadastros.filter(c => {
+                const matchSearch = c.nome.toLowerCase().includes(search) || c.id.includes(search);
+                const matchFilter = !filter || c.cargo === filter;
+                return matchSearch && matchFilter;
+            });
+
+            document.querySelector('#cadastrosTable tbody').innerHTML = filtered.map(c => `
+                <tr>
+                    <td>${c.id}</td>
+                    <td>${c.nome}</td>
+                    <td>${c.cidade}</td>
+                    <td><span class="badge badge-mantem">${c.cargo}</span></td>
+                    ${isAutenticado ? `<td><button class="btn-small" onclick="removerStaff('${c.id}')">Remover</button></td>` : ''}
+                </tr>
+            `).join('');
+        }
+
+        function renderCadastros() {
+            const uniqueCargos = [...new Set(cadastros.map(c => c.cargo))].sort();
+            const filterSelect = document.getElementById('filterCargo');
+            filterSelect.innerHTML = '<option value="">Todos os Cargos</option>' +
+                uniqueCargos.map(c => `<option value="${c}">${c}</option>`).join('');
+
+            document.getElementById('searchCadastro').addEventListener('input', renderCadastrosTable);
+            filterSelect.addEventListener('change', renderCadastrosTable);
+            renderCadastrosTable();
+        }
+
+        // Variável global para armazenar o texto do Discord
+        let discordTextCache = '';
+
+        function generateDiscordText() {
+            const data = {estagiarios, suportes, moderadores, admins, supervisores};
+
+            // IDs dos roles do Discord
+            const roleIds = {
+                supervisor: '1113315546092535819',
+                admin: '1113313855620268063',
+                moderador: '811632529701732362',
+                suporte: '811632529694130203',
+                estagiario: '811632529694130201'
+            };
+
+            // Emojis personalizados do Discord
+            const emojis = {
+                star: '<a:Star:1395085412631842886>',
+                bonus: '<a:bonusloja:1461084295845253170>',
+                promoDupla: '<:promo_dupla:1461084246708850912>',
+                promovido: '<:promovido:1461084204061294662>',
+                mantem: '<:check_02:817531243569872956>',
+                rebaixado: '<:rebaixado:1461084170083242109>',
+                exonerado: '<:exonerado:1461084061765468418>'
+            };
+
+            // Bônus por cargo
+            const bonusInfo = {
+                supervisor: 'BÔNUS DE ATÉ R$900,00 NO SITE VIP, SEM CUPOM DE DESCONTO.',
+                admin: 'BÔNUS DE ATÉ R$700,00 NO SITE VIP, SEM CUPOM DE DESCONTO.',
+                moderador: 'BÔNUS DE ATÉ R$500,00 NO SITE VIP, SEM CUPOM DE DESCONTO.',
+                suporte: 'BÔNUS DE ATÉ R$300,00 NO SITE VIP, SEM CUPOM DE DESCONTO.',
+                estagiario: 'BÔNUS DE ATÉ R$150,00 NO SITE VIP, SEM CUPOM DE DESCONTO.'
+            };
+
+            function getSituacaoEmoji(situacao) {
+                if (!situacao) return emojis.mantem;
+                const s = situacao.toUpperCase();
+                if (s.includes('PROMO DUPLA') || s.includes('PROMOÇÃO DUPLA')) return emojis.promoDupla;
+                if (s.includes('PROMO') || s.includes('PROMOVIDO')) return emojis.promovido;
+                if (s.includes('MANTÉM')) return emojis.mantem;
+                if (s.includes('REBAIXADO')) return emojis.rebaixado;
+                if (s.includes('EXONERADO')) return emojis.exonerado;
+                return emojis.mantem;
+            }
+
+            function getPremioEmoji(premio) {
+                if (!premio || premio === 'NÃO') return '';
+                return ` ${emojis.bonus}`;
+            }
+
+            const meses = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
+                           'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
+            const mesAtual = meses[new Date().getMonth()];
+            const anoAtual = new Date().getFullYear();
+
+            let texto = `# ${emojis.star}  **AVALIAÇÃO STAFF - ${mesAtual} DE ${anoAtual}** ${emojis.star}\n\n`;
+            texto += `    ${emojis.bonus} • **BÔNUS LOJA**\n`;
+            texto += `    ${emojis.promoDupla} • **PROMOÇÃO DUPLA**\n`;
+            texto += `    ${emojis.promovido} • **PROMOVIDO**\n`;
+            texto += `    ${emojis.mantem} • **MANTÉM**\n`;
+            texto += `    ${emojis.rebaixado} • **REBAIXADO**\n`;
+            texto += `    ${emojis.exonerado} • **EXONERADO**\n\n`;
+
+            // Supervisores
+            if (data.supervisores && data.supervisores.length > 0) {
+                texto += `<@&${roleIds.supervisor}> • **${bonusInfo.supervisor}**\n`;
+                data.supervisores.forEach(s => {
+                    const emoji = getSituacaoEmoji(s.situacao);
+                    const premioEmoji = getPremioEmoji(s.premio);
+                    const mention = s.discord_id ? `<@${s.discord_id}>` : s.nome;
+                    texto += `${emoji}${premioEmoji} ${mention}\n`;
+                });
+                texto += '\n';
+            }
+
+            // Admins
+            if (data.admins && data.admins.length > 0) {
+                texto += `<@&${roleIds.admin}> • **${bonusInfo.admin}**\n`;
+                data.admins.forEach(a => {
+                    const emoji = getSituacaoEmoji(a.situacao);
+                    const premioEmoji = getPremioEmoji(a.premio);
+                    const mention = a.discord_id ? `<@${a.discord_id}>` : a.nome;
+                    texto += `${emoji}${premioEmoji} ${mention}\n`;
+                });
+                texto += '\n';
+            }
+
+            // Moderadores
+            if (data.moderadores && data.moderadores.length > 0) {
+                texto += `<@&${roleIds.moderador}> • **${bonusInfo.moderador}**\n`;
+                data.moderadores.forEach(m => {
+                    const emoji = getSituacaoEmoji(m.situacao);
+                    const premioEmoji = getPremioEmoji(m.premio);
+                    const mention = m.discord_id ? `<@${m.discord_id}>` : m.nome;
+                    texto += `${emoji}${premioEmoji} ${mention}\n`;
+                });
+                texto += '\n';
+            }
+
+            // Suportes
+            if (data.suportes && data.suportes.length > 0) {
+                texto += `<@&${roleIds.suporte}> • **${bonusInfo.suporte}**\n`;
+                data.suportes.forEach(s => {
+                    const emoji = getSituacaoEmoji(s.situacao);
+                    const premioEmoji = getPremioEmoji(s.premio);
+                    const mention = s.discord_id ? `<@${s.discord_id}>` : s.nome;
+                    texto += `${emoji}${premioEmoji} ${mention}\n`;
+                });
+                texto += '\n';
+            }
+
+            // Estagiários
+            if (data.estagiarios && data.estagiarios.length > 0) {
+                texto += `<@&${roleIds.estagiario}> • **${bonusInfo.estagiario}**\n`;
+                data.estagiarios.forEach(e => {
+                    const emoji = getSituacaoEmoji(e.situacao);
+                    const premioEmoji = getPremioEmoji(e.premio);
+                    const mention = e.discord_id ? `<@${e.discord_id}>` : e.nome;
+                    texto += `${emoji}${premioEmoji} ${mention}\n`;
+                });
+            }
+
+            return texto;
+        }
+
+        function renderPreviewDiscord() {
+            discordTextCache = generateDiscordText();
+
+            // Converter para preview visual (substituir emojis por imagens ou texto)
+            let preview = discordTextCache;
+
+            // Estilizar o preview para parecer Discord
+            preview = preview.replace(/^# (.+)$/gm, '<div style="font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 10px;">$1</div>');
+            preview = preview.replace(/\*\*(.+?)\*\*/g, '<strong style="color: #fff;">$1</strong>');
+            preview = preview.replace(/<@&(\d+)>/g, '<span style="background: rgba(88, 101, 242, 0.3); color: #c9cdfb; padding: 0 4px; border-radius: 3px;">@Role</span>');
+            preview = preview.replace(/<@(\d+)>/g, '<span style="background: rgba(88, 101, 242, 0.3); color: #c9cdfb; padding: 0 4px; border-radius: 3px;">@$1</span>');
+            preview = preview.replace(/<a?:[^:]+:\d+>/g, '<span style="color: #faa61a;">✨</span>');
+            preview = preview.replace(/\n/g, '<br>');
+
+            document.getElementById('discordPreview').innerHTML = preview;
+        }
+
+        async function copyDiscordText(btn) {
+            if (!discordTextCache) {
+                discordTextCache = generateDiscordText();
+            }
+
+            const originalText = btn.textContent;
+            btn.textContent = 'Copiando...';
+            btn.disabled = true;
+
+            try {
+                await copyToClipboard(discordTextCache);
+                btn.textContent = 'Copiado!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            } catch (error) {
+                btn.textContent = 'Erro!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        function renderConfigMetas() {
+            const cargoNames = {EST: 'Estagiário', SUP: 'Suporte', MOD: 'Moderador', ADM: 'Administrador', SPV: 'Supervisor'};
+            let html = '';
+            for (const [cargo, label] of Object.entries(cargoNames)) {
+                const metasCargo = metas[cargo];
+                html += `
+                    <div class="card" style="margin-bottom:20px;">
+                        <h3 style="color:var(--accent-light); margin-bottom:15px;">${label} (${cargo})</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Métrica</th>
+                                        <th>Meta Promoção</th>
+                                        <th>Meta Premiação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${Object.entries(metasCargo).map(([metrica, valores]) => `
+                                        <tr>
+                                            <td style="font-weight:600; color:var(--text-secondary);">${metrica}</td>
+                                            <td><input type="number" class="editable" value="${valores.promocao}" onchange="updateMeta('${cargo}','${metrica}','promocao',this.value)"></td>
+                                            <td><input type="number" class="editable" value="${valores.premiacao}" onchange="updateMeta('${cargo}','${metrica}','premiacao',this.value)"></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('configMetasContent').innerHTML = html;
+        }
+
+        async function updateMeta(cargo, metrica, tipo, valor) {
+            metas[cargo][metrica][tipo] = Number(valor);
+            saveData();
+
+            if (isAutenticado) {
+                try {
+                    await api.patch(`/metas/${cargo}/${metrica}`, { [tipo]: Number(valor) });
+                } catch (error) {
+                    console.warn('Erro ao atualizar meta no servidor:', error);
+                }
+            }
+        }
+
+        function renderEstagiariosTable() {
+            const metasEst = metas.EST;
+            document.getElementById('estagiarioContent').innerHTML = `
+                <div class="staff-count">37 estagiários / 92 total</div>
+
+                <div class="card meta-table">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">METAS</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Métrica</th>
+                                    <th>Normal</th>
+                                    <th>Extra</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>HORAS</td><td>50</td><td>100</td></tr>
+                                <tr><td>AT. SUPORTE</td><td>300</td><td>400</td></tr>
+                                <tr><td>CHAT DUVIDAS</td><td>50</td><td>100</td></tr>
+                                <tr><td>AT. CIDADE</td><td>300</td><td>400</td></tr>
+                                <tr><td>AULAS</td><td>1</td><td>4</td></tr>
+                                <tr><td>BAN HACK</td><td>0</td><td>40</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px; font-size:0.95rem;">PERFORMANCE</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Staff</th>
+                                    <th>Discord ID</th>
+                                    <th>Cargo</th>
+                                    <th>Situação</th>
+                                    <th>Aproveitamento(%)</th>
+                                    <th>HORAS</th>
+                                    <th>AT.SUPORTE</th>
+                                    <th>CHAT DUVIDAS</th>
+                                    <th>AT.CIDADE</th>
+                                    <th>AULAS</th>
+                                    <th>BAN HACK</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${estagiarios.map((e, idx) => {const ap = calcAprov(e, metasEst); return `
+                                    <tr>
+                                        <td>${e.nome}</td>
+                                        <td><input type="text" class="editable" style="width:140px" value="${e.discord_id || ''}" onchange="updateEstagiario(${idx}, 'discord_id', this.value)" placeholder="ID Discord"></td>
+                                        <td>${cargoSelect('estagiarios', idx, e.cargo)}</td>
+                                        <td>${situacaoSelect('estagiarios', idx, e.situacao)}</td>
+                                        <td>
+                                            <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(ap, 100)}%"></div></div>
+                                            <div class="progress-text">${ap}%</div>
+                                        </td>
+                                        <td><input type="number" class="editable" value="${e.horas}" onchange="updateEstagiario(${idx}, 'horas', this.value)"> <span class="meta-check">${e.horas >= metasEst.HORAS.promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${e.atSup}" onchange="updateEstagiario(${idx}, 'atSup', this.value)"> <span class="meta-check">${e.atSup >= metasEst['AT.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${e.chat}" onchange="updateEstagiario(${idx}, 'chat', this.value)"> <span class="meta-check">${e.chat >= metasEst['CHAT DUVIDAS'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${e.atCid}" onchange="updateEstagiario(${idx}, 'atCid', this.value)"> <span class="meta-check">${e.atCid >= metasEst['AT.CIDADE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${e.aulas}" onchange="updateEstagiario(${idx}, 'aulas', this.value)"> <span class="meta-check">${e.aulas >= metasEst.AULAS.promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${e.ban}" onchange="updateEstagiario(${idx}, 'ban', this.value)"></td>
+                                    </tr>
+                                `}).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSuportesTable() {
+            const metasSup = metas.SUP;
+            document.getElementById('suporteContent').innerHTML = `
+                <div class="staff-count">27 suportes / 92 total</div>
+
+                <div class="card meta-table">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">METAS</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Métrica</th>
+                                    <th>Normal</th>
+                                    <th>Extra</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>HORAS</td><td>90</td><td>150</td></tr>
+                                <tr><td>AT. SUPORTE</td><td>300</td><td>400</td></tr>
+                                <tr><td>AUX. SUPORTE</td><td>150</td><td>250</td></tr>
+                                <tr><td>AT. CIDADE</td><td>300</td><td>500</td></tr>
+                                <tr><td>TCKT DENUNCIA</td><td>120</td><td>200</td></tr>
+                                <tr><td>AULAS</td><td>1</td><td>8</td></tr>
+                                <tr><td>BAN HACK</td><td>10</td><td>30</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px; font-size:0.95rem;">PERFORMANCE</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Staff</th>
+                                    <th>Discord ID</th>
+                                    <th>Cargo</th>
+                                    <th>Situação</th>
+                                    <th>Prêmio</th>
+                                    <th>Aproveitamento(%)</th>
+                                    <th>HORAS</th>
+                                    <th>AT.SUPORTE</th>
+                                    <th>AUX.SUPORTE</th>
+                                    <th>AT.CIDADE</th>
+                                    <th>DENUNCIA</th>
+                                    <th>AULAS</th>
+                                    <th>BAN HACK</th>
+                                    <th>TELAGEM</th>
+                                    <th>TICKET SS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${suportes.map((s, idx) => {const ap = calcAprov(s, metasSup); return `
+                                    <tr>
+                                        <td>${s.nome}</td>
+                                        <td><input type="text" class="editable" style="width:140px" value="${s.discord_id || ''}" onchange="updateSuporte(${idx}, 'discord_id', this.value)" placeholder="ID Discord"></td>
+                                        <td>${cargoSelect('suportes', idx, s.cargo)}</td>
+                                        <td>${situacaoSelect('suportes', idx, s.situacao)}</td>
+                                        <td>${premioSelect('suportes', idx, s.premio)}</td>
+                                        <td>
+                                            <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(ap, 100)}%"></div></div>
+                                            <div class="progress-text">${ap}%</div>
+                                        </td>
+                                        <td><input type="number" class="editable" value="${s.horas}" onchange="updateSuporte(${idx}, 'horas', this.value)"> <span class="meta-check">${s.horas >= metasSup.HORAS.promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.atSup}" onchange="updateSuporte(${idx}, 'atSup', this.value)"> <span class="meta-check">${s.atSup >= metasSup['AT.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.auxSup}" onchange="updateSuporte(${idx}, 'auxSup', this.value)"> <span class="meta-check">${s.auxSup >= metasSup['AUX.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.atCid}" onchange="updateSuporte(${idx}, 'atCid', this.value)"> <span class="meta-check">${s.atCid >= metasSup['AT.CIDADE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.denuncia}" onchange="updateSuporte(${idx}, 'denuncia', this.value)"> <span class="meta-check">${s.denuncia >= metasSup['TCKT DENUNCIA'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.aulas}" onchange="updateSuporte(${idx}, 'aulas', this.value)"> <span class="meta-check">${s.aulas >= metasSup.AULAS.promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.ban}" onchange="updateSuporte(${idx}, 'ban', this.value)"> <span class="meta-check">${s.ban >= metasSup['BAN HACK'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.telagem}" onchange="updateSuporte(${idx}, 'telagem', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${s.ticketSS}" onchange="updateSuporte(${idx}, 'ticketSS', this.value)"></td>
+                                    </tr>
+                                `}).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderModeradoresTable() {
+            const metasMod = metas.MOD;
+            document.getElementById('moderadorContent').innerHTML = `
+                <div class="staff-count">7 moderadores / 92 total</div>
+
+                <div class="card meta-table">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">METAS</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Métrica</th>
+                                    <th>Normal</th>
+                                    <th>Extra</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>HORAS</td><td>100</td><td>180</td></tr>
+                                <tr><td>AT. SUPORTE</td><td>60</td><td>150</td></tr>
+                                <tr><td>AUX. SUPORTE</td><td>150</td><td>250</td></tr>
+                                <tr><td>AT. CIDADE</td><td>200</td><td>400</td></tr>
+                                <tr><td>TCKT DENUNCIA</td><td>80</td><td>150</td></tr>
+                                <tr><td>TCKT REVISÃO</td><td>100</td><td>200</td></tr>
+                                <tr><td>INSTRUÇÕES</td><td>5</td><td>10</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px; font-size:0.95rem;">PERFORMANCE</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Staff</th>
+                                    <th>Discord ID</th>
+                                    <th>Cargo</th>
+                                    <th>Situação</th>
+                                    <th>Prêmio</th>
+                                    <th>Aproveitamento(%)</th>
+                                    <th>HORAS</th>
+                                    <th>AT.SUPORTE</th>
+                                    <th>AUX.SUPORTE</th>
+                                    <th>AT.CIDADE</th>
+                                    <th>DENUNCIA</th>
+                                    <th>REVISÃO</th>
+                                    <th>INSTRUÇÕES</th>
+                                    <th>ENTREVISTAS</th>
+                                    <th>BAN HACK</th>
+                                    <th>TELAGEM</th>
+                                    <th>TICKET SS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${moderadores.map((m, idx) => {const ap = calcAprov(m, metasMod); return `
+                                    <tr>
+                                        <td>${m.nome}</td>
+                                        <td><input type="text" class="editable" style="width:140px" value="${m.discord_id || ''}" onchange="updateModerador(${idx}, 'discord_id', this.value)" placeholder="ID Discord"></td>
+                                        <td>${cargoSelect('moderadores', idx, m.cargo)}</td>
+                                        <td>${situacaoSelect('moderadores', idx, m.situacao)}</td>
+                                        <td>${premioSelect('moderadores', idx, m.premio)}</td>
+                                        <td>
+                                            <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(ap, 100)}%"></div></div>
+                                            <div class="progress-text">${ap}%</div>
+                                        </td>
+                                        <td><input type="number" class="editable" value="${m.horas}" onchange="updateModerador(${idx}, 'horas', this.value)"> <span class="meta-check">${m.horas >= metasMod.HORAS.promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${m.atSup}" onchange="updateModerador(${idx}, 'atSup', this.value)"> <span class="meta-check">${m.atSup >= metasMod['AT.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${m.auxSup}" onchange="updateModerador(${idx}, 'auxSup', this.value)"> <span class="meta-check">${m.auxSup >= metasMod['AUX.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${m.atCid}" onchange="updateModerador(${idx}, 'atCid', this.value)"> <span class="meta-check">${m.atCid >= metasMod['AT.CIDADE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${m.denuncia}" onchange="updateModerador(${idx}, 'denuncia', this.value)"> <span class="meta-check">${m.denuncia >= metasMod['TCKT DENUNCIA'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${m.revisao}" onchange="updateModerador(${idx}, 'revisao', this.value)"> <span class="meta-check">${m.revisao >= metasMod['TCKT REVISÃO'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${m.instrucoes}" onchange="updateModerador(${idx}, 'instrucoes', this.value)"> <span class="meta-check">${m.instrucoes >= metasMod['INSTRUÇÕES'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${m.entrevistas}" onchange="updateModerador(${idx}, 'entrevistas', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${m.ban}" onchange="updateModerador(${idx}, 'ban', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${m.telagem}" onchange="updateModerador(${idx}, 'telagem', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${m.ticketSS}" onchange="updateModerador(${idx}, 'ticketSS', this.value)"></td>
+                                    </tr>
+                                `}).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminsTable() {
+            const metasAdm = metas.ADM;
+            document.getElementById('administradorContent').innerHTML = `
+                <div class="staff-count">9 administradores / 92 total</div>
+
+                <div class="card meta-table">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">METAS</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Métrica</th>
+                                    <th>Normal</th>
+                                    <th>Extra</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>HORAS</td><td>120</td><td>200</td></tr>
+                                <tr><td>AT. SUPORTE</td><td>60</td><td>150</td></tr>
+                                <tr><td>AUX. SUPORTE</td><td>200</td><td>300</td></tr>
+                                <tr><td>AT. CIDADE</td><td>100</td><td>200</td></tr>
+                                <tr><td>TCKT DENUNCIA</td><td>80</td><td>150</td></tr>
+                                <tr><td>TCKT REVISÃO</td><td>100</td><td>200</td></tr>
+                                <tr><td>INSTRUÇÕES</td><td>5</td><td>10</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px; font-size:0.95rem;">PERFORMANCE</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Staff</th>
+                                    <th>Discord ID</th>
+                                    <th>Cargo</th>
+                                    <th>Situação</th>
+                                    <th>Prêmio</th>
+                                    <th>Aproveitamento(%)</th>
+                                    <th>HORAS</th>
+                                    <th>AT.SUPORTE</th>
+                                    <th>AUX.SUPORTE</th>
+                                    <th>AT.CIDADE</th>
+                                    <th>DENUNCIA</th>
+                                    <th>REVISÃO</th>
+                                    <th>INSTRUÇÕES</th>
+                                    <th>ENTREVISTAS</th>
+                                    <th>DEVOLUÇÕES</th>
+                                    <th>BAN HACK</th>
+                                    <th>TELAGEM</th>
+                                    <th>TICKET SS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${admins.map((a, idx) => {const ap = calcAprov(a, metasAdm); return `
+                                    <tr>
+                                        <td>${a.nome}</td>
+                                        <td><input type="text" class="editable" style="width:140px" value="${a.discord_id || ''}" onchange="updateAdmin(${idx}, 'discord_id', this.value)" placeholder="ID Discord"></td>
+                                        <td>${cargoSelect('admins', idx, a.cargo)}</td>
+                                        <td>${situacaoSelect('admins', idx, a.situacao)}</td>
+                                        <td>${premioSelect('admins', idx, a.premio)}</td>
+                                        <td>
+                                            <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(ap, 100)}%"></div></div>
+                                            <div class="progress-text">${ap}%</div>
+                                        </td>
+                                        <td><input type="number" class="editable" value="${a.horas}" onchange="updateAdmin(${idx}, 'horas', this.value)"> <span class="meta-check">${a.horas >= metasAdm.HORAS.promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${a.atSup}" onchange="updateAdmin(${idx}, 'atSup', this.value)"> <span class="meta-check">${a.atSup >= metasAdm['AT.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${a.auxSup}" onchange="updateAdmin(${idx}, 'auxSup', this.value)"> <span class="meta-check">${a.auxSup >= metasAdm['AUX.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${a.atCid}" onchange="updateAdmin(${idx}, 'atCid', this.value)"> <span class="meta-check">${a.atCid >= metasAdm['AT.CIDADE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${a.denuncia}" onchange="updateAdmin(${idx}, 'denuncia', this.value)"> <span class="meta-check">${a.denuncia >= metasAdm['TCKT DENUNCIA'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${a.revisao}" onchange="updateAdmin(${idx}, 'revisao', this.value)"> <span class="meta-check">${a.revisao >= metasAdm['TCKT REVISÃO'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${a.instrucoes}" onchange="updateAdmin(${idx}, 'instrucoes', this.value)"> <span class="meta-check">${a.instrucoes >= metasAdm['INSTRUÇÕES'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${a.entrevistas}" onchange="updateAdmin(${idx}, 'entrevistas', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${a.devolucoes}" onchange="updateAdmin(${idx}, 'devolucoes', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${a.ban}" onchange="updateAdmin(${idx}, 'ban', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${a.telagem}" onchange="updateAdmin(${idx}, 'telagem', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${a.ticketSS}" onchange="updateAdmin(${idx}, 'ticketSS', this.value)"></td>
+                                    </tr>
+                                `}).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSupervisoresTable() {
+            const metasSpv = metas.SPV || {
+                HORAS: {promocao: 50, premiacao: 100},
+                'AT.SUPORTE': {promocao: 30, premiacao: 60},
+                'AUX.SUPORTE': {promocao: 50, premiacao: 100},
+                'AT.CIDADE': {promocao: 50, premiacao: 100},
+                'TCKT DENUNCIA': {promocao: 20, premiacao: 50},
+                'TCKT REVISÃO': {promocao: 50, premiacao: 100},
+                'INSTRUÇÕES': {promocao: 0, premiacao: 5}
+            };
+            document.getElementById('supervisorContent').innerHTML = `
+                <div class="staff-count">12 supervisores / 92 total</div>
+
+                <div class="card meta-table">
+                    <h3 style="color: var(--accent-light); margin-bottom: 15px; font-size:0.95rem;">METAS</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Métrica</th>
+                                    <th>Normal</th>
+                                    <th>Extra</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>HORAS</td><td>${metasSpv.HORAS.promocao}</td><td>${metasSpv.HORAS.premiacao}</td></tr>
+                                <tr><td>AT. SUPORTE</td><td>${metasSpv['AT.SUPORTE'].promocao}</td><td>${metasSpv['AT.SUPORTE'].premiacao}</td></tr>
+                                <tr><td>AUX. SUPORTE</td><td>${metasSpv['AUX.SUPORTE'].promocao}</td><td>${metasSpv['AUX.SUPORTE'].premiacao}</td></tr>
+                                <tr><td>AT. CIDADE</td><td>${metasSpv['AT.CIDADE'].promocao}</td><td>${metasSpv['AT.CIDADE'].premiacao}</td></tr>
+                                <tr><td>TCKT DENUNCIA</td><td>${metasSpv['TCKT DENUNCIA'].promocao}</td><td>${metasSpv['TCKT DENUNCIA'].premiacao}</td></tr>
+                                <tr><td>TCKT REVISÃO</td><td>${metasSpv['TCKT REVISÃO'].promocao}</td><td>${metasSpv['TCKT REVISÃO'].premiacao}</td></tr>
+                                <tr><td>INSTRUÇÕES</td><td>${metasSpv['INSTRUÇÕES'].promocao}</td><td>${metasSpv['INSTRUÇÕES'].premiacao}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px; font-size:0.95rem;">PERFORMANCE</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Staff</th>
+                                    <th>Discord ID</th>
+                                    <th>Cargo</th>
+                                    <th>Situação</th>
+                                    <th>Prêmio</th>
+                                    <th>Aproveitamento(%)</th>
+                                    <th>HORAS</th>
+                                    <th>AT.SUPORTE</th>
+                                    <th>AUX.SUPORTE</th>
+                                    <th>AT.CIDADE</th>
+                                    <th>DENUNCIA</th>
+                                    <th>REVISÃO</th>
+                                    <th>INSTRUÇÕES</th>
+                                    <th>ENTREVISTAS</th>
+                                    <th>DEVOLUÇÕES</th>
+                                    <th>BAN HACK</th>
+                                    <th>TELAGEM</th>
+                                    <th>TICKET SS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${supervisores.map((s, idx) => {const ap = calcAprov(s, metasSpv); return `
+                                    <tr>
+                                        <td>${s.nome}</td>
+                                        <td><input type="text" class="editable" style="width:140px" value="${s.discord_id || ''}" onchange="updateSupervisor(${idx}, 'discord_id', this.value)" placeholder="ID Discord"></td>
+                                        <td>${cargoSelect('supervisores', idx, s.cargo)}</td>
+                                        <td>${situacaoSelect('supervisores', idx, s.situacao)}</td>
+                                        <td>${premioSelect('supervisores', idx, s.premio)}</td>
+                                        <td>
+                                            <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(ap, 100)}%"></div></div>
+                                            <div class="progress-text">${ap}%</div>
+                                        </td>
+                                        <td><input type="number" class="editable" value="${s.horas}" onchange="updateSupervisor(${idx}, 'horas', this.value)"> <span class="meta-check">${s.horas >= metasSpv.HORAS.promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.atSup}" onchange="updateSupervisor(${idx}, 'atSup', this.value)"> <span class="meta-check">${s.atSup >= metasSpv['AT.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.auxSup}" onchange="updateSupervisor(${idx}, 'auxSup', this.value)"> <span class="meta-check">${s.auxSup >= metasSpv['AUX.SUPORTE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.atCid}" onchange="updateSupervisor(${idx}, 'atCid', this.value)"> <span class="meta-check">${s.atCid >= metasSpv['AT.CIDADE'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.denuncia}" onchange="updateSupervisor(${idx}, 'denuncia', this.value)"> <span class="meta-check">${s.denuncia >= metasSpv['TCKT DENUNCIA'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.revisao}" onchange="updateSupervisor(${idx}, 'revisao', this.value)"> <span class="meta-check">${s.revisao >= metasSpv['TCKT REVISÃO'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.instrucoes}" onchange="updateSupervisor(${idx}, 'instrucoes', this.value)"> <span class="meta-check">${s.instrucoes >= metasSpv['INSTRUÇÕES'].promocao ? '✅' : '❌'}</span></td>
+                                        <td><input type="number" class="editable" value="${s.entrevistas}" onchange="updateSupervisor(${idx}, 'entrevistas', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${s.devolucoes}" onchange="updateSupervisor(${idx}, 'devolucoes', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${s.ban}" onchange="updateSupervisor(${idx}, 'ban', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${s.telagem}" onchange="updateSupervisor(${idx}, 'telagem', this.value)"></td>
+                                        <td><input type="number" class="editable" value="${s.ticketSS}" onchange="updateSupervisor(${idx}, 'ticketSS', this.value)"></td>
+                                    </tr>
+                                `}).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateEstagiario(idx, field, value) {
+            estagiarios[idx][field] = field === 'discord_id' ? value : (parseInt(value) || 0);
+            saveData();
+            renderEstagiariosTable();
+            renderDashboard();
+
+            // Atualizar via API (usando ID do registro)
+            const id = estagiarios[idx].id;
+            if (id) apiUpdateEstagiario(id, field, value);
+        }
+
+        function updateSuporte(idx, field, value) {
+            suportes[idx][field] = field === 'discord_id' ? value : (parseInt(value) || 0);
+            saveData();
+            renderSuportesTable();
+            renderDashboard();
+
+            const id = suportes[idx].id;
+            if (id) apiUpdateSuporte(id, field, value);
+        }
+
+        function updateModerador(idx, field, value) {
+            moderadores[idx][field] = field === 'discord_id' ? value : (parseInt(value) || 0);
+            saveData();
+            renderModeradoresTable();
+            renderDashboard();
+
+            const id = moderadores[idx].id;
+            if (id) apiUpdateModerador(id, field, value);
+        }
+
+        function updateAdmin(idx, field, value) {
+            admins[idx][field] = field === 'discord_id' ? value : (parseInt(value) || 0);
+            saveData();
+            renderAdminsTable();
+            renderDashboard();
+
+            const id = admins[idx].id;
+            if (id) apiUpdateAdmin(id, field, value);
+        }
+
+        function updateSupervisor(idx, field, value) {
+            supervisores[idx][field] = field === 'discord_id' ? value : (parseInt(value) || 0);
+            saveData();
+            renderSupervisoresTable();
+            renderDashboard();
+
+            const id = supervisores[idx].id;
+            if (id) apiUpdateSupervisor(id, field, value);
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // Inicialização
+        async function init() {
+            await loadData();
+            await checkSavedAuth();
+            renderDashboard();
+            renderRanking();
+            renderCadastros();
+            renderEstagiariosTable();
+            renderSuportesTable();
+            renderModeradoresTable();
+            renderAdminsTable();
+            renderSupervisoresTable();
+            renderConfigMetas();
+        }
+
+        init();
+    </script>
+</body>
+</html>
